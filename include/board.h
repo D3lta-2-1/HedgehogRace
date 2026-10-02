@@ -21,8 +21,10 @@ typedef struct {
 
 Board Board_new(size_t x, size_t y);
 BoardCell *Board_get(Board *board, size_t x, size_t y);
+size_t Board_canvas_height(Board *board);
+size_t Board_canvas_width(Board *board);
+void Board_draw(Board *board, Canvas *canvas);
 void Board_destroy(Board *board);
-
 /// draw a cell by it top left corner
 void BoardCell_draw_at(BoardCell *cell, Canvas *canvas, size_t x, size_t y);
 
