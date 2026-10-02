@@ -1,9 +1,12 @@
 #ifndef BOARD_H
 #define BOARD_H
 
+#include "canvas.h"
 #include <hedgehog_stack.h>
 #include <stdbool.h>
 #include <stddef.h>
+
+#define MAX_PLAYER_COUNT = 26
 
 typedef struct {
   HedgehogStack stack;
@@ -19,5 +22,8 @@ typedef struct {
 Board Board_new(size_t x, size_t y);
 BoardCell *Board_get(Board *board, size_t x, size_t y);
 void Board_destroy(Board *board);
+
+/// draw a cell by it top left corner
+void BoardCell_draw_at(BoardCell *cell, Canvas *canvas, size_t x, size_t y);
 
 #endif

@@ -18,6 +18,9 @@ typedef struct {
 Canvas Canvas_empty(size_t len_x, size_t len_y);
 void Canvas_clear(Canvas *canvas);
 void Canvas_set(Canvas *canvas, size_t x, size_t y, char c);
+// draw a line from connecting two points,
+void Canvas_draw_line(Canvas *canvas, size_t x1, size_t y1, size_t x2,
+                      size_t y2, char *motif);
 void canvas_flush(Canvas *canvas, FILE *file);
 void Canvas_destroy(Canvas *canvas);
 
