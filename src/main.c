@@ -1,11 +1,20 @@
 #include "hedgehog_stack.h"
-#include <board.h>
-#include <canvas.h>
+#include "board.h"
+#include "canvas.h"
 #include <stddef.h>
 #include <stdio.h>
+#include <time.h>
+#include <stdlib.h>
+
+int de() {
+    return rand() % 6 + 1;
+}
 
 int main(int argc, char **argv) {
-  Board board = Board_new(3, 3);
+
+  srand(time(NULL));
+
+  Board board = Board_new(12, 5);
 
   size_t width = Board_canvas_width(&board);
   size_t height = Board_canvas_height(&board);
