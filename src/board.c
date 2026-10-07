@@ -2,37 +2,42 @@
 #include "hedgehog_stack.h"
 #include <assert.h>
 #include <board.h>
-#include <math.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 
-Board Board_new(size_t n_lines, size_t n_columns) {
+Board Board_new(size_t width, size_t height) {
   Board board = {
-      malloc(sizeof(BoardCell) * n_lines * n_columns),
-      n_lines,
-      n_columns,
+      malloc(sizeof(BoardCell) * width * height),
+      width,
+      height,
   };
-  for (size_t i = 0; i < n_lines * n_columns; i++) {
+  for (size_t i = 0; i < width * height; i++) {
     board.cells[i].stack = (HedgehogStack){NULL, 0, 0};
     board.cells[i].trapped = false;
   }
-  Board* b = &board;
+
   // Trapped cells are fixed up to size 6x8
-  if (n_columns >= 3) board.cells[cell(0, 3, b)].trapped = true;
-  if (n_lines >= 2 && n_columns >= 7) board.cells[cell(2, 7, b)].trapped = true;
-  if (n_lines >= 3 && n_columns >= 5) board.cells[cell(3, 5, b)].trapped = true;
-  if (n_lines >= 4 && n_columns >= 6) board.cells[cell(4, 6, b)].trapped = true;
-  if (n_lines >= 5 && n_columns >= 4) board.cells[cell(5, 4, b)].trapped = true;
-  if (n_lines >= 6 && n_columns >= 8) board.cells[cell(6, 8, b)].trapped = true;
+  if (height >= 3)
+    Board_get(&board, 3, 0)->trapped = true;
+  if (width >= 2 && height >= 7)
+    Board_get(&board, 7, 2)->trapped = true;
+  if (width >= 3 && height >= 5)
+    Board_get(&board, 5, 3)->trapped = true;
+  if (width >= 4 && height >= 6)
+    Board_get(&board, 6, 4)->trapped = true;
+  if (width >= 5 && height >= 4)
+    Board_get(&board, 4, 5)->trapped = true;
+  if (width >= 6 && height >= 8)
+    Board_get(&board, 8, 6)->trapped = true;
 
   return board;
 }
 
-BoardCell *Board_get(Board *board, size_t line, size_t column) {
+BoardCell *Board_get(Board *board, size_t x, size_t y) {
   assert(line < board->n_lines && column < board->n_columns && "out of bounds");
-  return &board->cells[cell(line, column, board)];
+  return &board->cells[x + y * board->height];
 }
 
 #define MARGIN_TOP 2
@@ -44,31 +49,31 @@ BoardCell *Board_get(Board *board, size_t line, size_t column) {
 
 size_t Board_canvas_width(Board *board) {
   return MARGIN_LEFT +
-         board->n_lines * (CELL_DISPLAY_WIDTH + HORIZONTAL_SPACING) -
+         board->width * (CELL_DISPLAY_WIDTH + HORIZONTAL_SPACING) -
          HORIZONTAL_SPACING;
 }
 
 size_t Board_canvas_height(Board *board) {
-  return MARGIN_TOP + board->n_columns * (CELL_DISPLAY_HEIGHT + VERTICAL_SPACING) -
+  return MARGIN_TOP + board->height * (CELL_DISPLAY_HEIGHT + VERTICAL_SPACING) -
          VERTICAL_SPACING;
 }
 
 static void Board_draw_decoration(Board *board, Canvas *canvas) {
   // top decorations
-  for (size_t x = 0; x < board->n_lines; x++) {
+  for (size_t x = 0; x < board->width; x++) {
     size_t xorigin =
         MARGIN_LEFT + x * (CELL_DISPLAY_WIDTH + HORIZONTAL_SPACING);
     Canvas_draw_line(canvas, xorigin + 1, 0, xorigin + 3, 0, "row");
     Canvas_set(canvas, xorigin + 2, 1, 'a' + x);
   }
   // left decorations
-  for (size_t y = 0; y < board->n_columns; y++) {
+  for (size_t y = 0; y < board->height; y++) {
     size_t yorigin = MARGIN_TOP + y * (CELL_DISPLAY_HEIGHT + VERTICAL_SPACING);
     Canvas_draw_line(canvas, 0, yorigin + 1, 3, yorigin + 1, "line");
     // writing the value
     assert(y < 10000);
     char buffer[5] = {' ', ' ', ' ', ' ', '\0'};
-    size_t n = sprintf(buffer, "%zu", y);
+    size_t n = sprintf(buffer, "%zu", y + 1);
     if (n < 4)
       buffer[n] = ' ';
     Canvas_draw_line(canvas, 0, yorigin + 2, 3, yorigin + 2, buffer);
@@ -76,8 +81,8 @@ static void Board_draw_decoration(Board *board, Canvas *canvas) {
 }
 
 static void Board_draw_cells(Board *board, Canvas *canvas) {
-  for (size_t x = 0; x < board->n_lines; x++) {
-    for (size_t y = 0; y < board->n_columns; y++) {
+  for (size_t x = 0; x < board->width; x++) {
+    for (size_t y = 0; y < board->height; y++) {
       size_t xorigin =
           MARGIN_LEFT + x * (CELL_DISPLAY_WIDTH + HORIZONTAL_SPACING);
       size_t yorigin =
@@ -94,7 +99,7 @@ void Board_draw(Board *board, Canvas *canvas) {
 }
 
 void Board_destroy(Board *board) {
-  size_t cell_count = board->n_lines * board->n_columns;
+  size_t cell_count = board->width * board->height;
   for (size_t i = 0; i < cell_count; i++) {
     HedgehogStack_destroy(&board->cells[i].stack);
   }

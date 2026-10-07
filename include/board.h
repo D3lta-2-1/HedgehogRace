@@ -7,7 +7,6 @@
 #include <stddef.h>
 
 #define MAX_PLAYER_COUNT = 26
-#define cell(i, j, b) i * b->n_lines + j
 
 typedef struct {
   HedgehogStack stack;
@@ -16,11 +15,11 @@ typedef struct {
 
 typedef struct {
   BoardCell *cells;
-  size_t n_lines;
-  size_t n_columns;
+  size_t width;
+  size_t height;
 } Board;
 
-Board Board_new(size_t n_lines, size_t n_columns);
+Board Board_new(size_t width, size_t height);
 
 BoardCell *Board_get(Board *board, size_t line, size_t column);
 size_t Board_canvas_height(Board *board);

@@ -5,21 +5,21 @@
 #include <stdlib.h>
 #include <string.h>
 
-Canvas Canvas_empty(size_t len_x, size_t len_y) {
+Canvas Canvas_empty(size_t width, size_t height) {
   Canvas canvas = {// don't forget the '\0' and the `n`
-                   malloc(sizeof(char) * (len_x + 1) * len_y + 1), len_x,
-                   len_y};
-  for (size_t y = 0; y < len_y; y++) {
-    memset(canvas.content + y * (len_x + 1), ' ', len_x);
-    canvas.content[y * (len_x + 1) + len_x] = '\n';
+                   malloc(sizeof(char) * (width + 1) * height + 1), width,
+                   height};
+  for (size_t y = 0; y < height; y++) {
+    memset(canvas.content + y * (width + 1), ' ', width);
+    canvas.content[y * (width + 1) + width] = '\n';
   }
-  canvas.content[(len_x + 1) * len_y] = '\0';
+  canvas.content[(width + 1) * height] = '\0';
   return canvas;
 }
 
 void Canvas_clear(Canvas *canvas) {
-  for (size_t y = 0; y < canvas->len_y; y++) {
-    memset(canvas->content + y * (canvas->len_x + 1), ' ', canvas->len_x);
+  for (size_t y = 0; y < canvas->height; y++) {
+    memset(canvas->content + y * (canvas->width + 1), ' ', canvas->width);
   }
 }
 
@@ -31,7 +31,7 @@ static void ensure_within_range(Canvas *canvas, size_t x, size_t y) {
 void Canvas_set(Canvas *canvas, size_t x, size_t y, char c) {
   assert(c >= ' ' && "invalid character");
   ensure_within_range(canvas, x, y);
-  canvas->content[x + y * (canvas->len_x + 1)] = c;
+  canvas->content[x + y * (canvas->width + 1)] = c;
 }
 
 static ptrdiff_t sign(ptrdiff_t x) { return x > 0 ? 1 : (x < 0 ? -1 : 0); }

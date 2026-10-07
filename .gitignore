@@ -2,6 +2,7 @@
 .xmake/
 build/
 .cache/
+.zed/
 compile_commands.json
 
 # MacOS Cache

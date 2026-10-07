@@ -11,11 +11,11 @@ typedef struct {
   char *content;
   // this is the "inner size", since ext '\n' are required, len_x + 1 is often
   // used
-  size_t len_x;
-  size_t len_y;
+  size_t width;
+  size_t height;
 } Canvas;
 
-Canvas Canvas_empty(size_t len_x, size_t len_y);
+Canvas Canvas_empty(size_t width, size_t height);
 void Canvas_clear(Canvas *canvas);
 void Canvas_set(Canvas *canvas, size_t x, size_t y, char c);
 // draw a line from connecting two points,
