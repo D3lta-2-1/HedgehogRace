@@ -24,7 +24,7 @@ void Canvas_clear(Canvas *canvas) {
 }
 
 static void ensure_within_range(Canvas *canvas, size_t x, size_t y) {
-  assert(0 <= x && x < canvas->len_x && 0 <= y && y < canvas->len_y &&
+  assert(0 <= x && x < canvas->width && 0 <= y && y < canvas->height &&
          "out of bounds");
 }
 

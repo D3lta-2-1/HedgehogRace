@@ -35,9 +35,9 @@ Hedgehog HedgehogStack_pop(HedgehogStack *stack) {
   return hedgehog;
 }
 
-Hedgehog HedgehogStack_peek(HedgehogStack *stack) {
+Hedgehog *HedgehogStack_peek(HedgehogStack *stack) {
   assert(stack->len > 0 && "cannot pop on an empty stack");
-  return stack->hedgeogs[stack->len - 1];
+  return &stack->hedgeogs[stack->len - 1];
 }
 
 bool HedgehogStack_is_empty(HedgehogStack *stack) { return stack->len == 0; }

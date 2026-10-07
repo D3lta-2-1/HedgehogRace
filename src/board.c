@@ -1,4 +1,5 @@
 #include "canvas.h"
+#include "hedgehog.h"
 #include "hedgehog_stack.h"
 #include <assert.h>
 #include <board.h>
@@ -36,7 +37,7 @@ Board Board_new(size_t width, size_t height) {
 }
 
 BoardCell *Board_get(Board *board, size_t x, size_t y) {
-  assert(line < board->n_lines && column < board->n_columns && "out of bounds");
+  assert(x < board->width && y < board->height && "out of bounds");
   return &board->cells[x + y * board->height];
 }
 
@@ -113,8 +114,8 @@ void BoardCell_draw_at(BoardCell *cell, Canvas *canvas, size_t x, size_t y) {
   Canvas_draw_line(canvas, x + 4, y + 1, x + 4, y + 2,
                    cell->trapped ? "<" : "|");
   if (!HedgehogStack_is_empty(&cell->stack)) {
-    char player = HedgehogStack_peek(&cell->stack);
-    char motif[] = {'A' + player, '\0'};
+    Hedgehog *h = HedgehogStack_peek(&cell->stack);
+    char motif[] = {'A' + h->id, '\0'}; // id is the player id ?
     Canvas_draw_line(canvas, x + 1, y + 1, x + 3, y + 1, motif);
   }
 }

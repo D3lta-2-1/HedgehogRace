@@ -6,7 +6,8 @@
 #include <stdbool.h>
 #include <stddef.h>
 
-#define MAX_PLAYER_COUNT = 26
+#define MAX_PLAYER_COUNT 26
+#define MAX_HEGDEHOG_COUNT 4
 
 typedef struct {
   HedgehogStack stack;

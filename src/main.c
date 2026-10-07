@@ -1,14 +1,12 @@
-#include "hedgehog_stack.h"
 #include "board.h"
 #include "canvas.h"
+#include <hedgehog_stack.h>
 #include <stddef.h>
 #include <stdio.h>
-#include <time.h>
 #include <stdlib.h>
+#include <time.h>
 
-int de() {
-    return rand() % 6 + 1;
-}
+int de() { return rand() % 6 + 1; }
 
 int main(int argc, char **argv) {
 
@@ -23,8 +21,10 @@ int main(int argc, char **argv) {
   Board_get(&board, 1, 0)->trapped = true;
 
   BoardCell *c1 = Board_get(&board, 0, 0);
-  HedgehogStack_push(&c1->stack, 0);
-  HedgehogStack_push(&c1->stack, 1);
+
+  // TODO: FIX hedgehog creation
+  // HedgehogStack_push(&c1->stack, 0);
+  // HedgehogStack_push(&c1->stack, 1);
   BoardCell *c2 = Board_get(&board, 1, 0);
 
   Board_draw(&board, &canvas);
