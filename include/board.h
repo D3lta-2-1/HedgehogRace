@@ -7,6 +7,8 @@
 #include <stddef.h>
 
 #define MAX_PLAYER_COUNT = 26
+#define MAX_HEGDEHOG_COUNT 4
+
 #define cell(i, j, b) i * b->n_lines + j
 
 typedef struct {

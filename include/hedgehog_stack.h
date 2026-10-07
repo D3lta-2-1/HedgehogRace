@@ -5,13 +5,6 @@
 #include <stdint.h>
 #include <stddef.h>
 
-/// Player are represented by a value starting at 0
-typedef uint8_t Player;
-
-/// Comparing Hedgehog and Players make sense, they are equal if this Hedgehog
-/// is owned by the player.
-typedef uint8_t Hedgehog;
-
 /// a stack store a stack of Hedgoge, and implement a growable buffer stack
 /// the top element is at hedgeos[stack.len]
 typedef struct {

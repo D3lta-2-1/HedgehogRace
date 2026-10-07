@@ -13,6 +13,10 @@ int de() {
 int main(int argc, char **argv) {
 
   srand(time(NULL));
+  int n_lines, n_columns, n_players = 6, 9, 2;
+  // These will come from argv, they're constant for testing
+
+  
 
   Board board = Board_new(12, 5);
 
@@ -27,10 +31,16 @@ int main(int argc, char **argv) {
   HedgehogStack_push(&c1->stack, 1);
   BoardCell *c2 = Board_get(&board, 1, 0);
 
-  Board_draw(&board, &canvas);
+  
 
-  canvas_flush(&canvas, stdout);
-  fflush(stdout);
+  bool running = true;
+  while(running) {
+    Board_draw(&board, &canvas);
+    canvas_flush(&canvas, stdout);
+    fflush(stdout);
+
+
+  }
 
   return 0;
 }
