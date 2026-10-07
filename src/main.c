@@ -1,34 +1,31 @@
-#include "board.h"
-#include "canvas.h"
-#include <hedgehog_stack.h>
-#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stddef.h>
 #include <time.h>
+#include <game.h>
+#include <canvas.h>
 
 int de() { return rand() % 6 + 1; }
 
 int main(int argc, char **argv) {
-
   srand(time(NULL));
+  /*
+  if (argc < 4) return 1;
+  char player_count = *argv[1];
+  char n_lines = *argv[2];
+  char n_columns = *argv[3];
+  */
+  char player_count = 2;
+  char n_lines = 6;
+  char n_columns = 9;
+  
+  Game* game = init_game(player_count, n_lines, n_columns);
 
-  Board board = Board_new(12, 5);
-
-  size_t width = Board_canvas_width(&board);
-  size_t height = Board_canvas_height(&board);
+  size_t width = Board_canvas_width(game->board);
+  size_t height = Board_canvas_height(game->board);
   Canvas canvas = Canvas_empty(width, height);
 
-  Board_get(&board, 1, 0)->trapped = true;
-
-  BoardCell *c1 = Board_get(&board, 0, 0);
-
-  // TODO: FIX hedgehog creation
-  // HedgehogStack_push(&c1->stack, 0);
-  // HedgehogStack_push(&c1->stack, 1);
-  BoardCell *c2 = Board_get(&board, 1, 0);
-
-  Board_draw(&board, &canvas);
-
+  Board_draw(game->board, &canvas);
   canvas_flush(&canvas, stdout);
   fflush(stdout);
 

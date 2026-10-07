@@ -1,9 +1,9 @@
-#include <assert.h>
 #include <canvas.h>
-#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stddef.h>
+#include <assert.h>
 
 Canvas Canvas_empty(size_t width, size_t height) {
   Canvas canvas = {// don't forget the '\0' and the `n`
@@ -68,3 +68,75 @@ void canvas_flush(Canvas *canvas, FILE *file) {
 };
 
 void Canvas_destroy(Canvas *canvas) { free(canvas->content); }
+
+#define MARGIN_TOP 2
+#define MARGIN_LEFT 5
+#define HORIZONTAL_SPACING 1
+#define VERTICAL_SPACING 0
+#define CELL_DISPLAY_WIDTH 5
+#define CELL_DISPLAY_HEIGHT 4
+
+size_t Board_canvas_width(Board *board) {
+  return MARGIN_LEFT +
+         board->width * (CELL_DISPLAY_WIDTH + HORIZONTAL_SPACING) -
+         HORIZONTAL_SPACING;
+}
+
+size_t Board_canvas_height(Board *board) {
+  return MARGIN_TOP + board->height * (CELL_DISPLAY_HEIGHT + VERTICAL_SPACING) -
+         VERTICAL_SPACING;
+}
+
+static void Board_draw_decoration(Board *board, Canvas *canvas) {
+  // top decorations
+  for (size_t x = 0; x < board->width; x++) {
+    size_t xorigin =
+        MARGIN_LEFT + x * (CELL_DISPLAY_WIDTH + HORIZONTAL_SPACING);
+    Canvas_draw_line(canvas, xorigin + 1, 0, xorigin + 3, 0, "row");
+    Canvas_set(canvas, xorigin + 2, 1, 'a' + x);
+  }
+  // left decorations
+  for (size_t y = 0; y < board->height; y++) {
+    size_t yorigin = MARGIN_TOP + y * (CELL_DISPLAY_HEIGHT + VERTICAL_SPACING);
+    Canvas_draw_line(canvas, 0, yorigin + 1, 3, yorigin + 1, "line");
+    // writing the value
+    assert(y < 10000);
+    char buffer[5] = {' ', ' ', ' ', ' ', '\0'};
+    size_t n = sprintf(buffer, "%zu", y + 1);
+    if (n < 4)
+      buffer[n] = ' ';
+    Canvas_draw_line(canvas, 0, yorigin + 2, 3, yorigin + 2, buffer);
+  }
+}
+
+static void Board_draw_cells(Board *board, Canvas *canvas) {
+  for (size_t x = 0; x < board->width; x++) {
+    for (size_t y = 0; y < board->height; y++) {
+      size_t xorigin =
+          MARGIN_LEFT + x * (CELL_DISPLAY_WIDTH + HORIZONTAL_SPACING);
+      size_t yorigin =
+          MARGIN_TOP + y * (CELL_DISPLAY_HEIGHT + VERTICAL_SPACING);
+      BoardCell *cell = Board_get(board, x, y);
+      BoardCell_draw_at(cell, canvas, xorigin, yorigin);
+    }
+  }
+}
+
+void Board_draw(Board *board, Canvas *canvas) {
+  Board_draw_decoration(board, canvas);
+  Board_draw_cells(board, canvas);
+}
+
+void BoardCell_draw_at(BoardCell *cell, Canvas *canvas, size_t x, size_t y) {
+  Canvas_draw_line(canvas, x + 1, y, x + 3, y, cell->trapped ? "v" : "-");
+  Canvas_draw_line(canvas, x + 1, y + 3, x + 3, y + 3,
+                   cell->trapped ? "^" : "-");
+  Canvas_draw_line(canvas, x, y + 1, x, y + 2, cell->trapped ? ">" : "|");
+  Canvas_draw_line(canvas, x + 4, y + 1, x + 4, y + 2,
+                   cell->trapped ? "<" : "|");
+  if (!HedgehogStack_is_empty(&cell->stack)) {
+    Hedgehog *h = HedgehogStack_peek(&cell->stack);
+    char motif[] = {'A' + h->id, '\0'}; // id is the player id ?
+    Canvas_draw_line(canvas, x + 1, y + 1, x + 3, y + 1, motif);
+  }
+}

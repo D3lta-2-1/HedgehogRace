@@ -3,6 +3,7 @@
 
 #include <stddef.h>
 #include <stdio.h>
+#include <game.h>
 
 /// A buffer where to draw before display to the screen
 // the internal storage need a bit of care, '\n' and '\0' need to be placed at
@@ -23,5 +24,12 @@ void Canvas_draw_line(Canvas *canvas, size_t x1, size_t y1, size_t x2,
                       size_t y2, char *motif);
 void canvas_flush(Canvas *canvas, FILE *file);
 void Canvas_destroy(Canvas *canvas);
+
+size_t Board_canvas_height(Board *board);
+size_t Board_canvas_width(Board *board);
+void Board_draw(Board *board, Canvas *canvas);
+void Board_destroy(Board *board);
+/// draw a cell by it top left corner
+void BoardCell_draw_at(BoardCell *cell, Canvas *canvas, size_t x, size_t y);
 
 #endif
