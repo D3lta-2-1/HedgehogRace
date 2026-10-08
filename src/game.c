@@ -26,17 +26,17 @@ Game* init_game(char player_count, char n_lines, char n_columns) {
       int player_i = rand() % player_count;
       player = &g->players[player_i];
       if (player->finished < HEDGEHOG_COUNT) {
-        player->hedgehogs[player->finished] = (Hedgehog){i, line, START};
-        (void)HedgehogStack_push(&Board_get(g->board, START, line)->stack, &player->hedgehogs[player->finished]);
+        player->hedgehogs[player->finished] = (Hedgehog){player_i, line, START};
+        (void)HedgehogStack_push(&Board_get(g->board, START, line)->stack, player_i);
         player->finished++;
         not_allocated = false;
-        printf("%d\n",i);
       }
     }
   }
   for (int i = 0 ; i < player_count ; i++) {
     g->players[i].finished = 0;
   }
+  g->current_player = 0;
   return g;
 }
 
@@ -44,8 +44,8 @@ Game* init_game(char player_count, char n_lines, char n_columns) {
 /// returns true if current_player's hedgehog number hedgehog_index can move
 bool can_move(Game *g, int hedgehog_index) {
   Hedgehog* local = &g->players[g->current_player].hedgehogs[hedgehog_index];
-  Hedgehog* other = HedgehogStack_peek(&Board_get(g->board, local->column, local->line)->stack);
-  bool test_1 = local->id == other->id;
+  int other_i = HedgehogStack_peek(&Board_get(g->board, local->column, local->line)->stack);
+  bool test_1 = local->id == other_i;
   if (Board_get(g->board, local->column, local->line)->trapped) {
     for (int column = 0 ; column < local->column ; column++) {
       BoardCell* cell = Board_get(g->board, local->line, column);
@@ -64,41 +64,41 @@ HedgehogStack HedgehogStack_empty() {
 
 void Cell_grow(HedgehogStack *stack) {
   if (stack->capacity == 0) {
-    stack->hedgehogs = malloc(sizeof(Hedgehog*) * DEFAULT_SIZE);
+    stack->player_i = malloc(sizeof(int) * DEFAULT_SIZE);
     stack->capacity = DEFAULT_SIZE;
   } else {
     stack->capacity *= GROWTH_FACTOR;
-    stack->hedgehogs = realloc(stack->hedgehogs, stack->capacity);
+    stack->player_i = realloc(stack->player_i, stack->capacity);
   }
 }
 
 
-void HedgehogStack_push(HedgehogStack *stack, Hedgehog* hedgehog) {
+void HedgehogStack_push(HedgehogStack *stack, int player_i) {
   if (stack->len == stack->capacity) {
     Cell_grow(stack);
   }
-  stack->hedgehogs[stack->len] = hedgehog;
+  stack->player_i[stack->len] = player_i;
   stack->len++;
 }
 
-Hedgehog* HedgehogStack_pop(HedgehogStack *stack) {
+int HedgehogStack_pop(HedgehogStack *stack) {
   assert(stack->len > 0 && "cannot pop on an empty stack");
-  Hedgehog* hedgehog = stack->hedgehogs[stack->len - 1];
+  int player_i = stack->player_i[stack->len - 1];
   stack->len--;
-  return hedgehog;
+  return player_i;
 }
 
-Hedgehog *HedgehogStack_peek(HedgehogStack *stack) {
+int HedgehogStack_peek(HedgehogStack *stack) {
   assert(stack->len > 0 && "cannot pop on an empty stack");
-  return stack->hedgehogs[stack->len - 1];
+  return stack->player_i[stack->len - 1];
 }
 
 bool HedgehogStack_is_empty(HedgehogStack *stack) { return stack->len == 0; }
 
 void HedgehogStack_destroy(HedgehogStack *stack) {
-  if (stack->hedgehogs)
+  if (stack->player_i)
     return;
-  free(stack->hedgehogs);
+  free(stack->player_i);
 }
 
 
