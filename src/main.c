@@ -25,6 +25,7 @@ int main(int argc, char** argv) {
     size_t height = Board_canvas_height(game->board);
     Canvas canvas = Canvas_empty(width, height);
 
+    char answers[64];
     bool running = true;
     while (running) {
         Board_draw(game->board, &canvas);
@@ -36,9 +37,11 @@ int main(int argc, char** argv) {
             player_can_move = player_can_move || can_move(game, i);
         }
         if (player_can_move) {
-            continue;
-        }
-    }
+            if (get_input(0)) {
+                
+            }
+            
 
+        }
     return 0;
 }

@@ -2,6 +2,8 @@
 #include <game.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+
 
 Game* init_game(char player_count, char n_lines, char n_columns) {
     assert(player_count <= MAX_PLAYER_COUNT &&
@@ -57,6 +59,52 @@ bool can_move(Game* g, int hedgehog_index) {
     }
     return test_1;
 }
+
+void to_lower_str(char* s) {
+  int i = 0;
+  while (s[i] != '\0') {
+    s[i] = tolower(s[i]);
+  }
+}
+
+/// test yes no functions return -1 for invalid answers, 0 for no and 1 for yes
+int test_yes_no(char* string) {
+  if (!strcmp(string, "yes")) {
+    return 1
+  } else if (!strcmp(string, "no")) {
+    return 0
+  }
+  else 
+    return -1
+}
+
+/// manages all of the players answers
+/// 0 -> Do you want to move a hedgehog vertically ?
+int get_input(int i, char* answers) {
+  int res = -1
+  while (res == -1) {
+    switch (i) {
+      case 0:
+        printf("Do you want to move a hedgehog vertically ?\n");
+        scanf("%s\n", answers);
+        (void)to_lower_str(answers);
+        break;
+      case 1:
+        break;
+      default:
+        break;
+    }
+    switch (i) {
+      case 0:
+        int res = test_yes_no(answers);
+        break;
+    }
+    printf("Invalid entry\n");
+  }
+  return res;
+}
+                
+                
 
 HedgehogStack HedgehogStack_empty() {
     HedgehogStack stack = {NULL, 0, 0};
