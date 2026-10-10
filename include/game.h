@@ -9,16 +9,11 @@
 #define HEDGEHOG_COUNT 4
 #define START 0
 
-/// Stores it's players id and it's current position on the board
-typedef struct {
-    int id;
-    int line;
-    int column;
-} Hedgehog;
 
 #define DEFAULT_SIZE 4
 #define GROWTH_FACTOR 2
-/// allows storage of pointers to hedgehogs as a stack
+
+/// Allows storage of hedgehogs (identified by their player) as a stack
 typedef struct {
     int* player_i;
     size_t capacity;
@@ -28,11 +23,6 @@ typedef struct {
 /// Allows quick access to each players hedgehogs and number of hedgehogs that
 /// have finished the race
 typedef struct {
-    Hedgehog hedgehogs[HEDGEHOG_COUNT];
-    int finished;
-} Player;
-
-typedef struct {
     HedgehogStack stack;
     bool trapped;
 } BoardCell;
@@ -41,16 +31,12 @@ typedef struct {
     BoardCell* cells;
     size_t width;
     size_t height;
+    uint8_t current_player;
+    int* players
 } Board;
 
-/// Stores major information about the game
-typedef struct {
-    Board* board;
-    Player* players;
-    uint8_t current_player;
-} Game;
 
-Game* init_game(char player_count, char n_lines, char n_columns);
+Game* init_game(int player_count, int n_lines, int n_columns);
 bool can_move(Game* g, int hedgehog_index);
 
 HedgehogStack HedgehogStack_empty();
