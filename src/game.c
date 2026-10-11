@@ -37,7 +37,7 @@ Board Board_init(size_t width, size_t height) {
 
 BoardCell* Board_get(Board* board, size_t x, size_t y) {
     assert(x < board->width && y < board->height && "out of bounds");
-    return &board->cells[x + y * board->height];
+    return &board->cells[x + y * board->width];
 }
 
 void Board_destroy(Board* board) {
