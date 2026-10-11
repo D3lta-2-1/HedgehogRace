@@ -1,5 +1,6 @@
 #include <assert.h>
 #include <game.h>
+#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -89,8 +90,12 @@ int HedgehogStack_pop(HedgehogStack* stack) {
 }
 
 int HedgehogStack_peek(HedgehogStack* stack) {
-    assert(stack->len > 0 && "cannot pop on an empty stack");
-    return stack->player_i[stack->len - 1];
+    return HedgehogStack_peek_nth(stack, 0);
+}
+
+int HedgehogStack_peek_nth(HedgehogStack* stack, size_t nth) {
+    assert(stack->len > 0 && nth < stack->len);
+    return stack->player_i[stack->len - 1 - nth];
 }
 
 bool HedgehogStack_is_empty(HedgehogStack* stack) { return stack->len == 0; }

@@ -1,3 +1,4 @@
+#include "game.h"
 #include <assert.h>
 #include <canvas.h>
 #include <stddef.h>
@@ -129,19 +130,46 @@ void Board_draw(Board* board, Canvas* canvas) {
     Board_draw_cells(board, canvas);
 }
 
-/*
-void BoardCell_draw_at(BoardCell *cell, Canvas *canvas, size_t x, size_t y) {
-  Canvas_draw_line(canvas, x + 1, y, x + 3, y, cell->trapped ? "v" : "-");
-  Canvas_draw_line(canvas, x + 1, y + 3, x + 3, y + 3,
-  cell->trapped ? "^" : "-");
-  Canvas_draw_line(canvas, x, y + 1, x, y + 2, cell->trapped ? ">" : "|");
-  Canvas_draw_line(canvas, x + 4, y + 1, x + 4, y + 2,
-  cell->trapped ? "<" : "|");
-  if (!HedgehogStack_is_empty(&cell->stack)) {
-    Hedgehog *h = HedgehogStack_peek(&cell->stack);
-    char motif[] = {'A' + h->id, '\0'}; // id is the player id ?
-    Canvas_draw_line(canvas, x + 1, y + 1, x + 3, y + 1, motif);
-  }
-}
+void BoardCell_draw_at(BoardCell* cell, Canvas* canvas, size_t x, size_t y) {
+    // draw cell borders
+    Canvas_draw_line(canvas, x + 1, y, x + 3, y, cell->trapped ? "v" : "-");
+    Canvas_draw_line(canvas, x + 1, y + 3, x + 3, y + 3,
+                     cell->trapped ? "^" : "-");
+    Canvas_draw_line(canvas, x, y + 1, x, y + 2, cell->trapped ? ">" : "|");
+    Canvas_draw_line(canvas, x + 4, y + 1, x + 4, y + 2,
+                     cell->trapped ? "<" : "|");
+    // draw inner content
+    if (HedgehogStack_is_empty(&cell->stack))
+        return;
+    int owner = HedgehogStack_peek(&cell->stack);
+    char top_motif[] = {'A' + owner, '\0'}; // id is the player id ?
+    Canvas_draw_line(canvas, x + 1, y + 1, x + 3, y + 1, top_motif);
+    const size_t len = cell->stack.len;
+    char second_line_motif[4] = "   ";
+    switch (len) {
+    case 1:
+        Canvas_draw_line(canvas, x + 1, y + 2, x + 3, y + 2, top_motif);
+        return; // don't print the numbers at the bottom
+    case 2:
+        second_line_motif[1] = 'a' + HedgehogStack_peek_nth(&cell->stack, 1);
+        Canvas_draw_line(canvas, x + 1, y + 2, x + 3, y + 2, second_line_motif);
+        break;
+    case 3:
+        second_line_motif[0] = 'a' + HedgehogStack_peek_nth(&cell->stack, 1);
+        second_line_motif[2] = 'a' + HedgehogStack_peek_nth(&cell->stack, 2);
+        Canvas_draw_line(canvas, x + 1, y + 2, x + 3, y + 2, second_line_motif);
+        break;
+    case 4:
+        second_line_motif[0] = 'a' + HedgehogStack_peek_nth(&cell->stack, 1);
+        second_line_motif[1] = 'a' + HedgehogStack_peek_nth(&cell->stack, 2);
+        second_line_motif[2] = 'a' + HedgehogStack_peek_nth(&cell->stack, 3);
+        Canvas_draw_line(canvas, x + 1, y + 2, x + 3, y + 2, second_line_motif);
+        break;
+    }
 
-*/
+    char buffer[2] = "X\0";
+    if (len < 10) {
+        sprintf(buffer, "%zu", len);
+    }
+    Canvas_set(canvas, x + 2, y + 3, buffer[0]);
+}

@@ -25,20 +25,10 @@ int main(int argc, char** argv) {
     size_t height = Board_canvas_height(game->board);
     Canvas canvas = Canvas_empty(width, height);
 
-    bool running = true;
-    while (running) {
-        Board_draw(game->board, &canvas);
-        canvas_flush(&canvas, stdout);
-        fflush(stdout);
-
-        bool player_can_move = false;
-        for (int i = 0; i < HEDGEHOG_COUNT; i++) {
-            player_can_move = player_can_move || can_move(game, i);
-        }
-        if (player_can_move) {
-            continue;
-        }
-    }
+    Canvas_clear(&canvas);
+    Board_draw(game->board, &canvas);
+    canvas_flush(&canvas, stdout);
+    fflush(stdout);
 
     return 0;
 }

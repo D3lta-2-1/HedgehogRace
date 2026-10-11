@@ -57,6 +57,7 @@ HedgehogStack HedgehogStack_empty();
 void HedgehogStack_push(HedgehogStack* stack, int player_i);
 int HedgehogStack_pop(HedgehogStack* stack);
 int HedgehogStack_peek(HedgehogStack* stack);
+int HedgehogStack_peek_nth(HedgehogStack* stack, size_t nth);
 bool HedgehogStack_is_empty(HedgehogStack* stack);
 void HedgehogStack_destroy(HedgehogStack* stack);
 
