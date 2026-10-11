@@ -19,18 +19,18 @@ Board Board_init(size_t width, size_t height) {
     }
 
     // Trapped cells are fixed up to size 6x8
-    if (height >= 3)
-        Board_get(&board, 3, 0)->trapped = true;
-    if (width >= 2 && height >= 7)
-        Board_get(&board, 7, 2)->trapped = true;
-    if (width >= 3 && height >= 5)
+    if (width >= 2)
+        Board_get(&board, 2, 0)->trapped = true;
+    if (height >= 1 && width >= 6)
+        Board_get(&board, 6, 1)->trapped = true;
+    if (height >= 2 && width >= 4)
+        Board_get(&board, 4, 2)->trapped = true;
+    if (height >= 3 && width >= 5)
         Board_get(&board, 5, 3)->trapped = true;
-    if (width >= 4 && height >= 6)
-        Board_get(&board, 6, 4)->trapped = true;
-    if (width >= 5 && height >= 4)
-        Board_get(&board, 4, 5)->trapped = true;
-    if (width >= 6 && height >= 8)
-        Board_get(&board, 8, 6)->trapped = true;
+    if (height >= 4 && width >= 3)
+        Board_get(&board, 3, 4)->trapped = true;
+    if (height >= 5 && width >= 7)
+        Board_get(&board, 7, 5)->trapped = true;
 
     return board;
 }
@@ -47,10 +47,10 @@ void Board_destroy(Board* board) {
     }
 }
 
-Game Game_init(int player_count, int n_lines, int n_columns) {
+Game Game_init(int player_count, size_t height, size_t width) {
     assert(player_count <= MAX_PLAYER_COUNT && "cannot have more than 26 players");
     Game game;
-    game.board = Board_init(n_columns, n_lines);
+    game.board = Board_init(width, height);
     game.finished_hedgehogs_counts = malloc(player_count * sizeof(size_t));
     if (!game.finished_hedgehogs_counts) {
         fprintf(stderr, "allocation failed");
@@ -60,13 +60,13 @@ Game Game_init(int player_count, int n_lines, int n_columns) {
         game.finished_hedgehogs_counts[i] = 0;
     }
     for (int i = 0; i < player_count * HEDGEHOG_COUNT; i++) {
-        int line = rand() % n_lines;
+        int y = rand() % height;
         bool not_allocated = true;
         Owner player;
         while (not_allocated) {
             player = rand() % player_count;
             if (game.finished_hedgehogs_counts[player] < HEDGEHOG_COUNT) {
-                BoardCell* cell = Board_get(&game.board, START, line);
+                BoardCell* cell = Board_get(&game.board, START, y);
                 HedgehogStack_push(&cell->stack, player);
                 game.finished_hedgehogs_counts[player]++;
                 not_allocated = false;
@@ -80,15 +80,17 @@ Game Game_init(int player_count, int n_lines, int n_columns) {
     return game;
 }
 
-bool Game_can_move(Game* game, int player, int line, int column) {
-    if (column == game->board.width - 1)
+bool Game_can_move(Game* game, int player, size_t x, size_t y) {
+    if (x == game->board.width - 1)
         return false;
-    // we know there is at least one hedgehog in the stack
-    int tophog = HedgehogStack_peek(&Board_get(&game->board, column, line)->stack);
+    HedgehogStack* stack = &Board_get(&game->board, x, y)->stack;
+    if (HedgehogStack_is_empty(stack))
+        return false;
+    int tophog = HedgehogStack_peek(stack);
     bool test_1 = player == tophog;
-    if (Board_get(&game->board, column, line)->trapped) {
-        for (int i = 0; i < column; i++) {
-            BoardCell* cell = Board_get(&game->board, line, i);
+    if (Board_get(&game->board, x, y)->trapped) {
+        for (int i = 0; i < x; i++) {
+            BoardCell* cell = Board_get(&game->board, i, y);
             if (cell->stack.len != 0)
                 return false;
         }
@@ -97,19 +99,19 @@ bool Game_can_move(Game* game, int player, int line, int column) {
 }
 
 bool Game_can_player_move_vertically(Game* game) {
-    for (int lines = 0; lines < game->board.height; lines++) {
-        for (int columns = 0; columns < game->board.width - 1; columns++) {
-            if (Game_can_move(game, game->current_player, lines, columns))
+    for (int y = 0; y < game->board.height; y++) {
+        for (int x = 0; x < game->board.width - 1; x++) {
+            if (Game_can_move(game, game->current_player, x, y))
                 return true;
         }
     }
     return false;
 }
 
-bool Game_can_player_move_horizontally(Game* game, int line) {
+bool Game_can_player_move_horizontally(Game* game, size_t y) {
     // hedgehogs on the last line cannot move
-    for (int column = 0; column < game->board.width - 2; column++) {
-        BoardCell* current = Board_get(&game->board, line, column);
+    for (int x = 0; x < game->board.width - 2; x++) {
+        BoardCell* current = Board_get(&game->board, x, y);
         // If a hedgehog were to be trapped and unable to move then there exists a previous hedgehog that can move
         // Otherwise the trapped hedgehog can move
         if (!HedgehogStack_is_empty(&current->stack))
@@ -118,41 +120,41 @@ bool Game_can_player_move_horizontally(Game* game, int line) {
     return false;
 }
 
-void Game_move_hedgehog_vertical(Game* game, size_t line, size_t column, int answer) {
+void Game_move_hedgehog_vertical(Game* game, size_t x, size_t y, int answer) {
     // we map 0 to -1 and 1 to 1;
     int up_down = 2 * answer - 1;
-    BoardCell* current = Board_get(&game->board, line, column);
+    BoardCell* current = Board_get(&game->board, x, y);
     int tophog = HedgehogStack_pop(&current->stack);
-    BoardCell* next = Board_get(&game->board, line + up_down, column);
+    BoardCell* next = Board_get(&game->board, x + up_down, y);
     HedgehogStack_push(&next->stack, tophog);
     return;
 }
 
-void Game_move_hedgehog_horizontal(Game* game, size_t line, size_t column) {
-    BoardCell* current = Board_get(&game->board, line, column);
+void Game_move_hedgehog_horizontal(Game* game, size_t x, size_t y) {
+    BoardCell* current = Board_get(&game->board, x, y);
     int tophog = HedgehogStack_pop(&current->stack);
-    BoardCell* next = Board_get(&game->board, line, column + 1);
+    BoardCell* next = Board_get(&game->board, x, y + 1);
     HedgehogStack_push(&next->stack, tophog);
     return;
 }
 
-int Game_check_hedgehog_vertical(Game* game, size_t line, size_t column) {
-    BoardCell* cell = Board_get(&game->board, line, column);
+Result Game_check_hedgehog_vertical(Game* game, size_t x, size_t y) {
+    BoardCell* cell = Board_get(&game->board, x, y);
     if (HedgehogStack_is_empty(&cell->stack))
-        return -1;
-    if (Game_can_move(game, game->current_player, line, column))
-        return 1;
-    return -1;
+        return ERROR;
+    if (Game_can_move(game, game->current_player, x, y))
+        return OPTION_1;
+    return ERROR;
 }
 
-int Game_check_hedgehog_horizontal(Game* game, size_t line, size_t column) {
-    BoardCell* cell = Board_get(&game->board, line, column);
+Result Game_check_hedgehog_horizontal(Game* game, size_t x, size_t y) {
+    BoardCell* cell = Board_get(&game->board, x, y);
     if (HedgehogStack_is_empty(&cell->stack))
-        return -1;
+        return ERROR;
     int tophog = HedgehogStack_peek(&cell->stack);
-    if (Game_can_move(game, tophog, line, column))
-        return 1;
-    return -1;
+    if (Game_can_move(game, tophog, x, y))
+        return OPTION_1;
+    return ERROR;
 }
 
 void Game_destroy(Game* game) {

@@ -25,7 +25,7 @@ typedef struct {
 
 /// Creates a board with traps
 Board Board_init(size_t width, size_t height);
-BoardCell* Board_get(Board* board, size_t line, size_t column);
+BoardCell* Board_get(Board* board, size_t x, size_t y);
 void Board_destroy(Board* board);
 
 typedef struct {
@@ -34,15 +34,21 @@ typedef struct {
     size_t* finished_hedgehogs_counts;
 } Game;
 
-Game Game_init(int player_count, int n_lines, int n_columns);
+typedef enum {
+    OPTION_1 = 1,
+    OPTION_2 = 0,
+    ERROR = -1
+} Result;
+
+Game Game_init(int player_count, size_t width, size_t height);
 /// returns true if player's hedgehog at line,column can move
-bool Game_can_move(Game* game, int player, int line, int column);
+bool Game_can_move(Game* game, int player, size_t x, size_t y);
 bool Game_can_player_move_vertically(Game* game);
-bool Game_can_player_move_horizontally(Game* game, int line);
-void Game_move_hedgehog_vertical(Game* game, size_t line, size_t column, int answer);
-void Game_move_hedgehog_horizontal(Game* game, size_t line, size_t column);
-int Game_check_hedgehog_vertical(Game* game, size_t line, size_t column);
-int Game_check_hedgehog_horizontal(Game* game, size_t line, size_t column);
+bool Game_can_player_move_horizontally(Game* game, size_t y);
+void Game_move_hedgehog_vertical(Game* game, size_t x, size_t y, int answer);
+void Game_move_hedgehog_horizontal(Game* game, size_t x, size_t y);
+Result Game_check_hedgehog_vertical(Game* game, size_t x, size_t y);
+Result Game_check_hedgehog_horizontal(Game* game, size_t x, size_t y);
 void Game_destroy(Game* game);
 
 #endif

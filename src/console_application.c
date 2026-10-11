@@ -97,43 +97,45 @@ static int dice(int k) { return rand() % k; }
 
 static void to_lower_str(char* s) {
     for (char* i = s; *i != '\0'; i++) {
-        *s = tolower(*s);
+        *i = tolower(*i);
     }
 }
 
-/// returns 1 if string = string_1 and 0 if string = string_0 otherwise -1
-static int test_binary_string(char* string, char* string_1, char* string_0) {
+static Result both_not_error(Result r1, Result r2) {
+    if (r1 != ERROR && r2 != ERROR) return ERROR;
+    else return OPTION_1;
+}
+/// returns OPTION_1 if string = string_1, OPTION_2 if string = string_2 and ERROR otherwise
+static Result test_binary_string(char* string, char* string_1, char* string_2) {
     if (!strcmp(string, string_1)) {
-        return 1;
-    } else if (!strcmp(string, string_0)) {
-        return 0;
+        return OPTION_1;
+    } else if (!strcmp(string, string_2)) {
+        return OPTION_2;
     } else
-        return -1;
+        return ERROR;
 }
 
-static int check_coordinates_line(Board* b, char answer) {
-    int line = (int)(answer - '1');
-    if (line >= 0 && line < b->height) {
-        return line;
+static Result check_coordinates_y(Board* b, int y) {
+    if (y >= 0 && y < b->height) {
+        return y;
     } else {
-        return -1;
+        return ERROR;
     }
 }
 
-static int check_coordinates_column(Board* b, char answer) {
-    int column = (int)(answer - 'a');
-    if (column >= 0 && column < b->width) {
-        return column;
+static Result check_coordinates_x(Board* b, int x) {
+    if (x >= 0 && x < b->width) {
+        return x;
     } else {
-        return -1;
+        return ERROR;
     }
 }
 
-static int test_vertical_move(Board* b, int answer, char line) {
+static Result test_vertical_move(Board* b, int answer, char line) {
     if (line == 0 && answer == 1)
-        return -1;
+        return ERROR;
     else if (line == b->height - 1 && answer == 0)
-        return -1;
+        return ERROR;
     else
         return answer;
 }
@@ -144,35 +146,39 @@ static int test_vertical_move(Board* b, int answer, char line) {
 /// 2 -> Where would you like to move it ?
 /// 3 -> which hedgehog would you like to move ?
 static int get_input(Game* game, int i, char* answers) {
-    static char line_static;
-    int line_1;
-    int column_1;
-    int line_3;
-    int column_3;
-    int res = -1;
-    while (res == -1) {
-        printf("Player %zu, ", game->current_player);
+    static char y_static;
+    int y_1;
+    int x_1;
+    int y_3;
+    int x_3;
+    char* yes = "yes";
+    char* no = "no";
+    char* up = "up";
+    char* down = "down";
+    Result res = ERROR;
+    printf("Player %zu, ", game->current_player);
+    while (res == ERROR) {
         // Player input
         switch (i) {
         case 0:
             printf("do you want to move a hedgehog vertically ?\n");
-            scanf("%s\n", answers);
+            scanf("%s", answers);
             to_lower_str(answers);
             break;
         case 1:
             printf("which of your hedgehogs would you like to move ? (format:1a)\n");
-            scanf("%s\n", answers);
+            scanf("%s", answers);
             answers[1] = tolower(answers[1]);
             break;
         case 2:
             printf("where would you like to move it ? (up or down)\n");
-            scanf("%s\n", answers);
+            scanf("%s", answers);
             to_lower_str(answers);
             break;
         case 3:
-            line_3 = (int)answers[0];
+            y_3 = (int)answers[0];
             printf("which hedgehog would you like to move ? (format : a)\n");
-            scanf("%s\n", answers);
+            scanf("%s", answers);
             answers[0] = tolower(answers[0]);
         default:
             break;
@@ -180,14 +186,15 @@ static int get_input(Game* game, int i, char* answers) {
         // Verification and player help
         switch (i) {
         case 0:
-            res = test_binary_string(answers, "yes", "no");
+            res = test_binary_string(answers, yes, no);
             break;
         case 1:
-            line_1 = check_coordinates_line(&game->board, answers[0]);
-            column_1 = check_coordinates_column(&game->board, answers[1]);
-            if (line_1 != -1 && column_1 != -1) {
-                res = Game_check_hedgehog_vertical(game, line_1, column_1);
-                if (res == -1) {
+            y_1 = (int)(answers[0] - '1');
+            x_1 = (int)(answers[1] - 'a');
+            res = both_not_error(check_coordinates_y(&game->board, y_1), check_coordinates_x(&game->board, x_1));
+            if (res != ERROR ) {
+                res = Game_check_hedgehog_vertical(game, x_1, y_1);
+                if (res == ERROR) {
                     printf(
                         "Either that isn't a/your hedgehog or it cannot move\nTo be able to move, a hedgehog must either be at the top of a cell or, if it is trapped, the fist on that line, hence :");
                 }
@@ -196,11 +203,11 @@ static int get_input(Game* game, int i, char* answers) {
             }
             break;
         case 2:
-            res = test_binary_string(answers, "up", "down");
-            if (res != -1) {
-                res = test_vertical_move(&game->board, res, line_static);
-                if (res == -1) {
-                    if (line_static == 0) {
+            res = test_binary_string(answers, up, down);
+            if (res != ERROR) {
+                res = test_vertical_move(&game->board, res, y_static);
+                if (res == ERROR) {
+                    if (y_static == 0) {
                         printf("This hedgehog cannot move up, hence : ");
                     } else {
                         printf("This hedgehog cannot move down, hence : ");
@@ -209,10 +216,10 @@ static int get_input(Game* game, int i, char* answers) {
             }
             break;
         case 3:
-            column_3 = check_coordinates_column(&game->board, answers[0]);
-            if (line_3 != -1 && column_3 != -1) {
-                res = Game_check_hedgehog_horizontal(game, line_3, column_3);
-                if (res == -1) {
+            x_3 = check_coordinates_x(&game->board, answers[0]);
+            if (y_3 != ERROR && x_3 != ERROR) {
+                res = Game_check_hedgehog_horizontal(game, x_3, y_3);
+                if (res == ERROR) {
                     printf("Either that isn't a hedgehog or it cannot move\nTo be able to move, a hedgehog must either be at the top of a cell or, if it is trapped, the fist on that line, hence :");
                 }
             } else {
@@ -220,18 +227,18 @@ static int get_input(Game* game, int i, char* answers) {
             }
             break;
         }
-        if (res == -1)
-            printf("Invalid entry\n");
+        if (res == ERROR)
+            printf("Invalid entry\n So, ");
     }
     // Returns and data management
     switch (i) {
     case 1:
-        line_static = answers[0] - '1';
-        return res;
+        y_static = answers[0] - '1';
+        return 0;
     case 3:
-        return column_3;
+        return x_3;
     default:
-        return res;
+        return 0;
     }
 }
 
@@ -262,28 +269,28 @@ void ConsoleApplication_run(ConsoleApplication* app) {
     while (running) {
         ConsoleApplication_draw(app);
 
-        int dice_line = dice(app->game.board.height);
-        printf("Player %zu, the dice rolled a %d !\n", app->game.current_player, dice_line + 1);
+        int dice_y = dice(app->game.board.height);
+        printf("Player %zu, the dice rolled a %d !\n", app->game.current_player, dice_y + 1);
         if (Game_can_player_move_vertically(&app->game)) {
             // 0 -> Do you want to move a hedgehog vertically ?
             if (get_input(&app->game, 0, answers)) {
                 // 1 -> Which of your hedgehogs would you like to move ?
                 get_input(&app->game, 1, answers);
-                int line = (int)(answers[0] - '1');
-                int column = (int)(answers[1] - 'a');
+                int x = (int)(answers[1] - 'a');
+                int y = (int)(answers[0] - '1');
                 // 2 -> Where would you like to move it ?
-                Game_move_hedgehog_vertical(&app->game, line, column, get_input(&app->game, 2, answers));
+                Game_move_hedgehog_vertical(&app->game, x, y, get_input(&app->game, 2, answers));
             }
         } else {
             printf("Player %zu, you cannot move any hedgehogs vertically\n", app->game.current_player);
         }
-        if (Game_can_player_move_horizontally(&app->game, dice_line)) {
+        if (Game_can_player_move_horizontally(&app->game, dice_y)) {
             // 3 Which hedgehog would you like to move ?
-            answers[0] = (char)dice_line;
-            int column = get_input(&app->game, 3, answers);
-            Game_move_hedgehog_horizontal(&app->game, dice_line, column);
+            answers[0] = (char)dice_y;
+            int x = get_input(&app->game, 3, answers);
+            Game_move_hedgehog_horizontal(&app->game, x, dice_y);
         } else {
-            printf("Player %zu, there are no movable hedgehogs on line %d, your turn is skipped\n", app->game.current_player, dice_line);
+            printf("Player %zu, there are no movable hedgehogs on line %d, your turn is skipped\n", app->game.current_player, dice_y);
         }
     }
 }
