@@ -126,7 +126,7 @@ void Game_move_hedgehog_vertical(Game* game, size_t x, size_t y, int answer) {
     int up_down = 2 * answer - 1;
     BoardCell* current = Board_get(&game->board, x, y);
     int tophog = HedgehogStack_pop(&current->stack);
-    BoardCell* next = Board_get(&game->board, x + up_down, y);
+    BoardCell* next = Board_get(&game->board, x, y + up_down);
     HedgehogStack_push(&next->stack, tophog);
     return;
 }
@@ -134,7 +134,7 @@ void Game_move_hedgehog_vertical(Game* game, size_t x, size_t y, int answer) {
 void Game_move_hedgehog_horizontal(Game* game, size_t x, size_t y) {
     BoardCell* current = Board_get(&game->board, x, y);
     int tophog = HedgehogStack_pop(&current->stack);
-    BoardCell* next = Board_get(&game->board, x, y + 1);
+    BoardCell* next = Board_get(&game->board, x + 1, y);
     HedgehogStack_push(&next->stack, tophog);
     return;
 }

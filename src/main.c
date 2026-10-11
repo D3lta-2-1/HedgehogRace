@@ -8,7 +8,6 @@ int main(int argc, char** argv) {
     char player_count = *argv[1];
     char n_lines = *argv[2];
     char n_columns = *argv[3];
-    // convert to int ?
     */
 
     ConsoleApplication app = ConsoleApplication_init();
