@@ -101,16 +101,7 @@ static void to_lower_str(char* s) {
     }
 }
 
-/// test yes no functions return -1 for invalid answers, 0 for no and 1 for yes
-static int test_yes_no(char* string) {
-    if (!strcmp(string, "yes")) {
-        return 1;
-    } else if (!strcmp(string, "no")) {
-        return 0;
-    } else
-        return -1;
-}
-
+/// returns 1 if string = string_1 and 0 if string = string_0 otherwise -1
 static int test_binary_string(char* string, char* string_1, char* string_0) {
     if (!strcmp(string, string_1)) {
         return 1;
