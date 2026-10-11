@@ -12,6 +12,7 @@ typedef struct {
 ConsoleApplication ConsoleApplication_init();
 void ConsoleApplication_draw(ConsoleApplication* app);
 void ConsoleApplication_run(ConsoleApplication* app);
+void ConsoleApplication_end(ConsoleApplication* app);
 void ConsoleApplication_destroy(ConsoleApplication* app);
 
 #endif

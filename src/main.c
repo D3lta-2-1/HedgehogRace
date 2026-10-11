@@ -13,5 +13,6 @@ int main(int argc, char** argv) {
 
     ConsoleApplication app = ConsoleApplication_init();
     ConsoleApplication_run(&app);
+    ConsoleApplication_destroy(&app);
     return EXIT_SUCCESS;
 }

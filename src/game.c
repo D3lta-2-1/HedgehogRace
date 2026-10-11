@@ -77,6 +77,7 @@ Game Game_init(int player_count, size_t height, size_t width) {
         game.finished_hedgehogs_counts[i] = 0;
     }
     game.current_player = 0;
+    game.player_count = player_count;
     return game;
 }
 

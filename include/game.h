@@ -31,6 +31,7 @@ void Board_destroy(Board* board);
 typedef struct {
     Board board;
     Owner current_player;
+    int player_count;
     size_t* finished_hedgehogs_counts;
 } Game;
 
