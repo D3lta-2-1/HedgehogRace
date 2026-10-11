@@ -1,4 +1,3 @@
-#include "game.h"
 #include <assert.h>
 #include <canvas.h>
 #include <stddef.h>
@@ -8,8 +7,7 @@
 
 Canvas Canvas_empty(size_t width, size_t height) {
     Canvas canvas = {// don't forget the '\0' and the `n`
-                     malloc(sizeof(char) * (width + 1) * height + 1), width,
-                     height};
+                     malloc(sizeof(char) * (width + 1) * height + 1), width, height};
     for (size_t y = 0; y < height; y++) {
         memset(canvas.content + y * (width + 1), ' ', width);
         canvas.content[y * (width + 1) + width] = '\n';
@@ -24,10 +22,7 @@ void Canvas_clear(Canvas* canvas) {
     }
 }
 
-static void ensure_within_range(Canvas* canvas, size_t x, size_t y) {
-    assert(0 <= x && x < canvas->width && 0 <= y && y < canvas->height &&
-           "out of bounds");
-}
+static void ensure_within_range(Canvas* canvas, size_t x, size_t y) { assert(0 <= x && x < canvas->width && 0 <= y && y < canvas->height && "out of bounds"); }
 
 void Canvas_set(Canvas* canvas, size_t x, size_t y, char c) {
     assert(c >= ' ' && "invalid character");
@@ -37,8 +32,7 @@ void Canvas_set(Canvas* canvas, size_t x, size_t y, char c) {
 
 static ptrdiff_t sign(ptrdiff_t x) { return x > 0 ? 1 : (x < 0 ? -1 : 0); }
 
-void Canvas_draw_line(Canvas* canvas, size_t x1, size_t y1, size_t x2,
-                      size_t y2, char* motif) {
+void Canvas_draw_line(Canvas* canvas, size_t x1, size_t y1, size_t x2, size_t y2, char* motif) {
     assert(*motif != '\0' && "the motif can't be empty");
     char* motif_iter = motif;
     const ptrdiff_t dx = x2 - x1;
@@ -64,112 +58,6 @@ void Canvas_draw_line(Canvas* canvas, size_t x1, size_t y1, size_t x2,
     }
 }
 
-void canvas_flush(Canvas* canvas, FILE* file) {
-    fprintf(file, "%s", canvas->content);
-};
+void Canvas_flush(Canvas* canvas, FILE* file) { fprintf(file, "%s", canvas->content); };
 
 void Canvas_destroy(Canvas* canvas) { free(canvas->content); }
-
-#define MARGIN_TOP 2
-#define MARGIN_LEFT 5
-#define HORIZONTAL_SPACING 1
-#define VERTICAL_SPACING 0
-#define CELL_DISPLAY_WIDTH 5
-#define CELL_DISPLAY_HEIGHT 4
-
-size_t Board_canvas_width(Board* board) {
-    return MARGIN_LEFT +
-           board->width * (CELL_DISPLAY_WIDTH + HORIZONTAL_SPACING) -
-           HORIZONTAL_SPACING;
-}
-
-size_t Board_canvas_height(Board* board) {
-    return MARGIN_TOP +
-           board->height * (CELL_DISPLAY_HEIGHT + VERTICAL_SPACING) -
-           VERTICAL_SPACING;
-}
-
-static void Board_draw_decoration(Board* board, Canvas* canvas) {
-    // top decorations
-    for (size_t x = 0; x < board->width; x++) {
-        size_t xorigin =
-            MARGIN_LEFT + x * (CELL_DISPLAY_WIDTH + HORIZONTAL_SPACING);
-        Canvas_draw_line(canvas, xorigin + 1, 0, xorigin + 3, 0, "row");
-        Canvas_set(canvas, xorigin + 2, 1, 'a' + x);
-    }
-    // left decorations
-    for (size_t y = 0; y < board->height; y++) {
-        size_t yorigin =
-            MARGIN_TOP + y * (CELL_DISPLAY_HEIGHT + VERTICAL_SPACING);
-        Canvas_draw_line(canvas, 0, yorigin + 1, 3, yorigin + 1, "line");
-        // writing the value
-        assert(y < 10000);
-        char buffer[5] = {' ', ' ', ' ', ' ', '\0'};
-        size_t n = sprintf(buffer, "%zu", y + 1);
-        if (n < 4)
-            buffer[n] = ' ';
-        Canvas_draw_line(canvas, 0, yorigin + 2, 3, yorigin + 2, buffer);
-    }
-}
-
-static void Board_draw_cells(Board* board, Canvas* canvas) {
-    for (size_t x = 0; x < board->width; x++) {
-        for (size_t y = 0; y < board->height; y++) {
-            size_t xorigin =
-                MARGIN_LEFT + x * (CELL_DISPLAY_WIDTH + HORIZONTAL_SPACING);
-            size_t yorigin =
-                MARGIN_TOP + y * (CELL_DISPLAY_HEIGHT + VERTICAL_SPACING);
-            BoardCell* cell = Board_get(board, x, y);
-            BoardCell_draw_at(cell, canvas, xorigin, yorigin);
-        }
-    }
-}
-
-void Board_draw(Board* board, Canvas* canvas) {
-    Board_draw_decoration(board, canvas);
-    Board_draw_cells(board, canvas);
-}
-
-void BoardCell_draw_at(BoardCell* cell, Canvas* canvas, size_t x, size_t y) {
-    // draw cell borders
-    Canvas_draw_line(canvas, x + 1, y, x + 3, y, cell->trapped ? "v" : "-");
-    Canvas_draw_line(canvas, x + 1, y + 3, x + 3, y + 3,
-                     cell->trapped ? "^" : "-");
-    Canvas_draw_line(canvas, x, y + 1, x, y + 2, cell->trapped ? ">" : "|");
-    Canvas_draw_line(canvas, x + 4, y + 1, x + 4, y + 2,
-                     cell->trapped ? "<" : "|");
-    // draw inner content
-    if (HedgehogStack_is_empty(&cell->stack))
-        return;
-    int owner = HedgehogStack_peek(&cell->stack);
-    char top_motif[] = {'A' + owner, '\0'}; // id is the player id ?
-    Canvas_draw_line(canvas, x + 1, y + 1, x + 3, y + 1, top_motif);
-    const size_t len = cell->stack.len;
-    char second_line_motif[4] = "   ";
-    switch (len) {
-    case 1:
-        Canvas_draw_line(canvas, x + 1, y + 2, x + 3, y + 2, top_motif);
-        return; // don't print the numbers at the bottom
-    case 2:
-        second_line_motif[1] = 'a' + HedgehogStack_peek_nth(&cell->stack, 1);
-        Canvas_draw_line(canvas, x + 1, y + 2, x + 3, y + 2, second_line_motif);
-        break;
-    case 3:
-        second_line_motif[0] = 'a' + HedgehogStack_peek_nth(&cell->stack, 1);
-        second_line_motif[2] = 'a' + HedgehogStack_peek_nth(&cell->stack, 2);
-        Canvas_draw_line(canvas, x + 1, y + 2, x + 3, y + 2, second_line_motif);
-        break;
-    case 4:
-        second_line_motif[0] = 'a' + HedgehogStack_peek_nth(&cell->stack, 1);
-        second_line_motif[1] = 'a' + HedgehogStack_peek_nth(&cell->stack, 2);
-        second_line_motif[2] = 'a' + HedgehogStack_peek_nth(&cell->stack, 3);
-        Canvas_draw_line(canvas, x + 1, y + 2, x + 3, y + 2, second_line_motif);
-        break;
-    }
-
-    char buffer[2] = "X\0";
-    if (len < 10) {
-        sprintf(buffer, "%zu", len);
-    }
-    Canvas_set(canvas, x + 2, y + 3, buffer[0]);
-}
