@@ -36,8 +36,21 @@ typedef struct {
 } Board;
 
 
-Game* init_game(int player_count, int n_lines, int n_columns);
-bool can_move(Game* g, int hedgehog_index);
+Board* init_game(int player_count, int n_lines, int n_columns);
+bool can_move(Board* b, int player, int line, int column);
+bool player_can_move_vertical(Board* b);
+bool player_can_move_horizontal(Board* b, int line);
+void move_hedgehog_vertical(Board* b, int line, int column, int answer);
+void move_hedgehog_horizontal(Board* b, int line, int column);
+void to_lower_str(char* s);
+int test_yes_no(char* string);
+int test_binary_string(char* string, char* string_1, char* string_0);
+int check_coordinates_line(Board* b, char answer);
+int check_coordinates_column(Board* b, char answer);
+int check_hedgehog_vertical(Board* b, int line, int column);
+int check_hedgehog_horizontal(Board* b, int line, int column);
+int test_vertical_move(Board* b, int answer, char line);
+int get_input(Board* b, int i, char* answers);
 
 HedgehogStack HedgehogStack_empty();
 void HedgehogStack_push(HedgehogStack* stack, int player_i);

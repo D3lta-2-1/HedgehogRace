@@ -3,14 +3,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
 
 Board* init_game(int player_count, int n_lines, int n_columns) {
     assert(player_count <= MAX_PLAYER_COUNT &&
            "cannot have more than 26 players");
-
     Board* b = Board_init(n_columns, n_lines);
-    int* b->players = (int*)malloc(player_count * sizeof(int));
+    b->players = (int*)malloc(player_count * sizeof(int));
     for (int i = 0; i < player_count; i++) {
         b->players[i] = 0;
     }
@@ -22,29 +22,29 @@ Board* init_game(int player_count, int n_lines, int n_columns) {
             player = rand() % player_count;
             if (b->players[player] < HEDGEHOG_COUNT) {
                 HedgehogStack_push(
-                    &Board_get(g->board, START, line)->stack, player);
+                    &Board_get(b, START, line)->stack, player);
                 b->players[player]++;
                 not_allocated = false;
             }
         }
     }
     for (int i = 0; i < player_count; i++) {
-        g->players[i] = 0;
+        b->players[i] = 0;
     }
-    g->current_player = 0;
-    return g;
+    b->current_player = 0;
+    return b;
 }
 
 /// returns true if current_player's hedgehog number hedgehog_index can move
 bool can_move(Board* b, int player, int line, int column) {
-    if (column == g->board->width - 1) return false;
+    if (column == b->width - 1) return false;
     // we know there is at least one hedgehog in the stack
     int tophog = HedgehogStack_peek(
-        &Board_get(g->board, local.column, local.line)->stack);
+        &Board_get(b, column, line)->stack);
     bool test_1 = player == tophog;
-    if (Board_get(g->board, local.column, local.line)->trapped) {
-        for (int i = 0; i < local.column; i++) {
-            BoardCell* cell = Board_get(g->board, local.line, i);
+    if (Board_get(b, column, line)->trapped) {
+        for (int i = 0; i < column; i++) {
+            BoardCell* cell = Board_get(b, line, i);
             if (cell->stack.len != 0)
                 return false;
         }
@@ -53,8 +53,8 @@ bool can_move(Board* b, int player, int line, int column) {
 }
 
 bool player_can_move_vertical(Board* b) {
-    for (int lines = 0 ; lines < b->n_lines ; lines++) {
-        for (int columns = 0 ; columns < b->n_columns - 1; columns++) {
+    for (int lines = 0 ; lines < b->height ; lines++) {
+        for (int columns = 0 ; columns < b->width - 1; columns++) {
             if (can_move(b, b->current_player, lines, columns)) return true;
         }
     }
@@ -63,8 +63,8 @@ bool player_can_move_vertical(Board* b) {
 
 bool player_can_move_horizontal(Board* b, int line) {
     // hedgehogs on the last line cannot move
-    for (int column = 0 ; column < b->board->width - 2; column++) {
-        BoardCell* current = Board_get(b->board, line, column);
+    for (int column = 0 ; column < b->width - 2; column++) {
+        BoardCell* current = Board_get(b, line, column);
         // If a hedgehog were to be trapped and unable to move then there exists a previous hedgehog that can move
         // Otherwise the trapped hedgehog can move
         if (!HedgehogStack_is_empty(&current->stack)) return true;
@@ -75,17 +75,17 @@ bool player_can_move_horizontal(Board* b, int line) {
 void move_hedgehog_vertical(Board* b, int line, int column, int answer) {
     // we map 0 to -1 and 1 to 1;
     int up_down = 2 * answer - 1;
-    BoardCell* current = Board_get(g->board, line, column);
+    BoardCell* current = Board_get(b, line, column);
     int tophog = HedgehogStack_pop(&current->stack);
-    BoardCell* next = Board_get(g->board, line + up_down, column);
+    BoardCell* next = Board_get(b, line + up_down, column);
     HedgehogStack_push(&next->stack, tophog);
     return;
 }
 
-void move_hedgehog_horizontal(Game* g, int line, int column) {
-    BoardCell* current = Board_get(g->board, line, column);
+void move_hedgehog_horizontal(Board* b, int line, int column) {
+    BoardCell* current = Board_get(b, line, column);
     int tophog = HedgehogStack_pop(&current->stack);
-    BoardCell* next = Board_get(g->board, line, column+1);
+    BoardCell* next = Board_get(b, line, column+1);
     HedgehogStack_push(&next->stack, tophog);
     return;
 }
@@ -100,22 +100,22 @@ void to_lower_str(char* s) {
 /// test yes no functions return -1 for invalid answers, 0 for no and 1 for yes
 int test_yes_no(char* string) {
   if (!strcmp(string, "yes")) {
-    return 1
+    return 1;
   } else if (!strcmp(string, "no")) {
-    return 0
+    return 0;
   }
   else 
-    return -1
+    return -1;
 }
 
 int test_binary_string(char* string, char* string_1, char* string_0) {
   if (!strcmp(string, string_1)) {
-    return 1
+    return 1;
   } else if (!strcmp(string, string_0)) {
-    return 0
+    return 0;
   }
   else 
-    return -1
+    return -1;
 }
 
 int check_coordinates_line(Board* b, char answer) {
@@ -136,14 +136,14 @@ int check_coordinates_column(Board* b, char answer) {
 }
 
 int check_hedgehog_vertical(Board* b, int line, int column) {
-    BoardCell* cell = Board_get(g->board, line, column);
+    BoardCell* cell = Board_get(b, line, column);
     if (HedgehogStack_is_empty(&cell->stack)) return -1;
     if (can_move(b, b->current_player, line, column)) return 1;
     return -1;
 }
 
 int check_hedgehog_horizontal(Board* b, int line, int column) {
-    BoardCell* cell = Board_get(g->board, line, column);
+    BoardCell* cell = Board_get(b, line, column);
     if (HedgehogStack_is_empty(&cell->stack)) return -1;
     int tophog = HedgehogStack_peek(&cell->stack);
     if (can_move(b, tophog, line, column)) return 1;
@@ -152,8 +152,8 @@ int check_hedgehog_horizontal(Board* b, int line, int column) {
 
 int test_vertical_move(Board* b, int answer, char line) {
     if (line == 0 && answer == 1) return -1;
-    else if (line == b->height - 1 && answer == 0) return -1
-    else return move;
+    else if (line == b->height - 1 && answer == 0) return -1;
+    else return answer;
 }
 
 /// manages all of the players answers
@@ -162,7 +162,12 @@ int test_vertical_move(Board* b, int answer, char line) {
 /// 2 -> Where would you like to move it ?
 /// 3 -> which hedgehog would you like to move ?
 int get_input(Board* b, int i, char* answers) {
-  int res = -1
+  static char line_static;
+  int line_1;
+  int column_1;
+  int line_3;
+  int column_3;
+  int res = -1;
   while (res == -1) {
     printf("Player %d, ", b->current_player);
     // Player input
@@ -175,7 +180,7 @@ int get_input(Board* b, int i, char* answers) {
       case 1:
         printf("which of your hedgehogs would you like to move ? (format:1a)\n");
         scanf("%s\n", answers);
-        tolower(answers[2]);
+        tolower(answers[1]);
         break;
       case 2:
         printf("where would you like to move it ? (up or down)\n");
@@ -183,34 +188,34 @@ int get_input(Board* b, int i, char* answers) {
         to_lower_str(answers);
         break;
       case 3:
-        int line = (int)answers[0];
+        line_3 = (int)answers[0];
         printf("which hedgehog would you like to move ? (format : a)\n");
         scanf("%s\n", answers);
-        tolower(answers);
+        tolower(answers[0]);
       default:
         break;
     }
     // Verification and player help
     switch (i) {
       case 0:
-        int res = test_binary_string(answers, "yes", "no");
+        res = test_binary_string(answers, "yes", "no");
         break;
       case 1:
-        int line = check_coordinates_line(b, answers[0]);
-        int column = check_coordinates_column(b, answers[1]);
-        if (line != -1 && column != -1) {
-            int res = check_hedgehog_vertical(g, line, column);
+        line_1 = check_coordinates_line(b, answers[0]);
+        column_1 = check_coordinates_column(b, answers[1]);
+        if (line_1 != -1 && column_1 != -1) {
+            res = check_hedgehog_vertical(b, line_1, column_1);
             if (res == -1) {
-                printf("Either that isn't a/your hedgehog or it cannot move\nTo be able to move, a hedgehog must either be at the top of a cell or, if it is trapped, the fist on that line, hence :")
+                printf("Either that isn't a/your hedgehog or it cannot move\nTo be able to move, a hedgehog must either be at the top of a cell or, if it is trapped, the fist on that line, hence :");
             }
         } else {
             printf("Coordinates are format \nLine number Column letter, example 2c, hence :");
         }
         break;
       case 2:
-        int res = test_binary_string(answers, "up", "down");
+        res = test_binary_string(answers, "up", "down");
         if (res != -1) {
-            res = test_vertical_move(g, res, line_static);
+            res = test_vertical_move(b, res, line_static);
             if (res == -1) {
                 if (line_static == 0) {
                     printf("This hedgehog cannot move up, hence : ");
@@ -221,11 +226,11 @@ int get_input(Board* b, int i, char* answers) {
         }
         break;
       case 3:
-        int column = check_coordinates_column(b, answers[0]);
-        if (line != -1 && column != -1) {
-            int res = check_hedgehog_horizontal(g, line, column);
+        column_3 = check_coordinates_column(b, answers[0]);
+        if (line_3 != -1 && column_3 != -1) {
+            res = check_hedgehog_horizontal(b, line_3, column_3);
             if (res == -1) {
-                printf("Either that isn't a hedgehog or it cannot move\nTo be able to move, a hedgehog must either be at the top of a cell or, if it is trapped, the fist on that line, hence :")
+                printf("Either that isn't a hedgehog or it cannot move\nTo be able to move, a hedgehog must either be at the top of a cell or, if it is trapped, the fist on that line, hence :");
             }
         } else {
             printf("Coordinates are format \nColumn letter, example b, hence :");
@@ -235,14 +240,15 @@ int get_input(Board* b, int i, char* answers) {
     if (res == -1) printf("Invalid entry\n");
   }
   // Returns and data management
-  switch (i)
-    case 1:
-        static char line_static = answers[0] - '1';
-        return res
-    case 3:
-        return column;
-    default:
-        return res;
+  switch (i) {
+      case 1:
+          line_static = answers[0] - '1';
+          return res;
+      case 3:
+          return column_3;
+      default:
+          return res;
+  }
 }
                 
                 

@@ -35,19 +35,19 @@ int main(int argc, char** argv) {
         fflush(stdout);
 
         int dice_line = dice(n_lines);
-        printf("Player %d, the dice rolled a %d !\n", current_player, dice_line+1);
+        printf("Player %d, the dice rolled a %d !\n", board->current_player, dice_line+1);
         if (player_can_move_vertical(board)) {
             // 0 -> Do you want to move a hedgehog vertically ?
-            if (get_input(g, 0, answers)) {
+            if (get_input(board, 0, answers)) {
                 // 1 -> Which of your hedgehogs would you like to move ? 
-                get_input(board, 1, answers)
+                get_input(board, 1, answers);
                 int line = (int)(answers[0] - '1');
                 int column = (int)(answers[1] - 'a');
                 // 2 -> Where would you like to move it ?
-                move_hedgehog_vertical(board, line, column, get_input(g, 2, answers));
+                move_hedgehog_vertical(board, line, column, get_input(board, 2, answers));
             }
         } else {
-            printf("Player %d, you cannot move any hedgehogs vertically\n", current_player);
+            printf("Player %d, you cannot move any hedgehogs vertically\n", board->current_player);
         }
         if (player_can_move_horizontal(board, dice_line)) {
             // 3 Which hedgehog would you like to move ?
@@ -55,7 +55,7 @@ int main(int argc, char** argv) {
             int column = get_input(board, 3, answers);
             move_hedgehog_horizontal(board, dice_line, column);
         } else {
-            printf("Player %d, there are no movable hedgehogs on line %d, your turn is skipped\n", current_player, dice_line);
+            printf("Player %d, there are no movable hedgehogs on line %d, your turn is skipped\n", board->current_player, dice_line);
         }
     }
     return 0;
