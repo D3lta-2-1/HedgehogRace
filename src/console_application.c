@@ -50,7 +50,7 @@ static void draw_cell_at(BoardCell* cell, Canvas* canvas, size_t x, size_t y) {
     if (HedgehogStack_is_empty(&cell->stack))
         return;
     int owner = HedgehogStack_peek(&cell->stack);
-    char top_motif[] = {'A' + owner, '\0'}; // id is the player id ?
+    char top_motif[] = {'A' + owner, '\0'};
     Canvas_draw_line(canvas, x + 1, y + 1, x + 3, y + 1, top_motif);
     const size_t len = cell->stack.len;
     char second_line_motif[4] = "   ";

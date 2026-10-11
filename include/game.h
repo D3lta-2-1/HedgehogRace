@@ -35,7 +35,7 @@ typedef struct {
 } Game;
 
 Game Game_init(int player_count, int n_lines, int n_columns);
-/// returns true if current_player's hedgehog number ``hedgehog_index`` can move
+/// returns true if player's hedgehog at line,column can move
 bool Game_can_move(Game* game, int player, int line, int column);
 bool Game_can_player_move_vertically(Game* game);
 bool Game_can_player_move_horizontally(Game* game, int line);
