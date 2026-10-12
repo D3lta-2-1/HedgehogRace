@@ -47,7 +47,7 @@ void Board_destroy(Board* board) {
     }
 }
 
-Game Game_init(int player_count, size_t height, size_t width) {
+Game Game_init(int player_count, size_t width, size_t height) {
     assert(player_count <= MAX_PLAYER_COUNT && "cannot have more than 26 players");
     Game game;
     game.board = Board_init(width, height);
@@ -122,6 +122,7 @@ bool Game_can_player_move_horizontally(Game* game, size_t y) {
 }
 
 void Game_move_hedgehog_vertical(Game* game, size_t x, size_t y, int answer) {
+    // TODO: get a switch case here
     // we map 0 to -1 and 1 to 1;
     int up_down = 2 * answer - 1;
     BoardCell* current = Board_get(&game->board, x, y);

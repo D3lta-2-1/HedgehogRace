@@ -9,7 +9,7 @@ typedef struct {
     Game game;
 } ConsoleApplication;
 
-ConsoleApplication ConsoleApplication_init();
+ConsoleApplication ConsoleApplication_init(int player_count, size_t width, size_t height);
 void ConsoleApplication_draw(ConsoleApplication* app);
 void ConsoleApplication_run(ConsoleApplication* app);
 void ConsoleApplication_end(ConsoleApplication* app);

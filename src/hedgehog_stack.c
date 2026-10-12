@@ -2,6 +2,7 @@
 #include <hedgehog_stack.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #define DEFAULT_SIZE 4
 #define GROWTH_FACTOR 2
@@ -13,15 +14,18 @@ HedgehogStack HedgehogStack_empty() {
 
 static void grow(HedgehogStack* stack) {
     if (stack->capacity == 0) {
-        stack->player_i = malloc(sizeof(int) * DEFAULT_SIZE);
+        stack->player_i = malloc(sizeof(Owner) * DEFAULT_SIZE);
         stack->capacity = DEFAULT_SIZE;
     } else {
         stack->capacity *= GROWTH_FACTOR;
-        stack->player_i = realloc(stack->player_i, stack->capacity);
-    }
-    if (!stack->player_i) {
-        fprintf(stderr, "stack growth failed");
-        abort();
+        Owner* new_buffer = malloc(stack->capacity * sizeof(Owner));
+        if (!new_buffer) {
+            fprintf(stderr, "stack growth failed");
+            abort();
+        }
+        memcpy(new_buffer, stack->player_i, stack->len * sizeof(Owner));
+        free(stack->player_i);
+        stack->player_i = new_buffer;
     }
 }
 

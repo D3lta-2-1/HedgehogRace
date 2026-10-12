@@ -10,7 +10,7 @@ int main(int argc, char** argv) {
     char n_columns = *argv[3];
     */
 
-    ConsoleApplication app = ConsoleApplication_init();
+    ConsoleApplication app = ConsoleApplication_init(3, 6, 9);
     ConsoleApplication_run(&app);
     ConsoleApplication_destroy(&app);
     return EXIT_SUCCESS;
