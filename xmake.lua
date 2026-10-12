@@ -1,7 +1,11 @@
 add_rules("mode.debug", "mode.release", "mode.releasedbg")
 
-if is_mode("debug") then
+if is_mode("debug") and not is_plat("windows") then
     set_policy("build.sanitizer.address", true)
+end
+
+if is_plat("windows") then
+	add_defines("_CRT_SECURE_NO_WARNINGS")
 end
 
 target("HedgehogRace")

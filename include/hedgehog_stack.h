@@ -9,7 +9,7 @@ typedef size_t Owner;
 
 /// Allows storage of hedgehogs (identified by their player) as a stack
 typedef struct {
-    Owner* player_i;
+    Owner* hedgehogs;
     size_t capacity;
     size_t len;
 } HedgehogStack;

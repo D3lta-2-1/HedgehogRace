@@ -14,7 +14,7 @@ HedgehogStack HedgehogStack_empty() {
 
 static void grow(HedgehogStack* stack) {
     if (stack->capacity == 0) {
-        stack->player_i = malloc(sizeof(Owner) * DEFAULT_SIZE);
+        stack->hedgehogs = malloc(sizeof(Owner) * DEFAULT_SIZE);
         stack->capacity = DEFAULT_SIZE;
     } else {
         stack->capacity *= GROWTH_FACTOR;
@@ -23,9 +23,9 @@ static void grow(HedgehogStack* stack) {
             fprintf(stderr, "stack growth failed");
             abort();
         }
-        memcpy(new_buffer, stack->player_i, stack->len * sizeof(Owner));
-        free(stack->player_i);
-        stack->player_i = new_buffer;
+        memcpy(new_buffer, stack->hedgehogs, stack->len * sizeof(Owner));
+        free(stack->hedgehogs);
+        stack->hedgehogs = new_buffer;
     }
 }
 
@@ -33,13 +33,13 @@ void HedgehogStack_push(HedgehogStack* stack, Owner owner) {
     if (stack->len == stack->capacity) {
         grow(stack);
     }
-    stack->player_i[stack->len] = owner;
+    stack->hedgehogs[stack->len] = owner;
     stack->len++;
 }
 
 Owner HedgehogStack_pop(HedgehogStack* stack) {
     assert(stack->len > 0 && "cannot pop on an empty stack");
-    int player_i = stack->player_i[stack->len - 1];
+    Owner player_i = stack->hedgehogs[stack->len - 1];
     stack->len--;
     return player_i;
 }
@@ -48,13 +48,13 @@ Owner HedgehogStack_peek(HedgehogStack* stack) { return HedgehogStack_peek_nth(s
 
 Owner HedgehogStack_peek_nth(HedgehogStack* stack, size_t nth) {
     assert(stack->len > 0 && nth < stack->len);
-    return stack->player_i[stack->len - 1 - nth];
+    return stack->hedgehogs[stack->len - 1 - nth];
 }
 
 bool HedgehogStack_is_empty(HedgehogStack* stack) { return stack->len == 0; }
 
 void HedgehogStack_destroy(HedgehogStack* stack) {
-    if (stack->player_i)
+    if (stack->hedgehogs)
         return;
-    free(stack->player_i);
+    free(stack->hedgehogs);
 }

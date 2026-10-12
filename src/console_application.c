@@ -1,5 +1,6 @@
 #include "canvas.h"
 #include "game.h"
+#include "hedgehog_stack.h"
 #include <assert.h>
 #include <console_application.h>
 #include <ctype.h>
@@ -26,7 +27,7 @@ static void draw_decoration(Board* board, Canvas* canvas) {
     for (size_t x = 0; x < board->width; x++) {
         size_t xorigin = MARGIN_LEFT + x * (CELL_DISPLAY_WIDTH + HORIZONTAL_SPACING);
         Canvas_draw_line(canvas, xorigin + 1, 0, xorigin + 3, 0, "row");
-        Canvas_set(canvas, xorigin + 2, 1, 'a' + x);
+        Canvas_set(canvas, xorigin + 2, 1, 'a' + (char)x);
     }
     // left decorations
     for (size_t y = 0; y < board->height; y++) {
@@ -55,8 +56,8 @@ static void draw_cell_at(BoardCell* cell, Canvas* canvas, size_t x, size_t y) {
     // draw inner content
     if (HedgehogStack_is_empty(&cell->stack))
         return;
-    int owner = HedgehogStack_peek(&cell->stack);
-    char top_motif[] = {'A' + owner, '\0'};
+    Owner owner = HedgehogStack_peek(&cell->stack);
+    char top_motif[] = {'A' + (char)owner, '\0'};
     Canvas_draw_line(canvas, x + 1, y + 1, x + 3, y + 1, top_motif);
     const size_t len = cell->stack.len;
     char second_line_motif[4] = "   ";
@@ -65,18 +66,18 @@ static void draw_cell_at(BoardCell* cell, Canvas* canvas, size_t x, size_t y) {
         Canvas_draw_line(canvas, x + 1, y + 2, x + 3, y + 2, top_motif);
         return; // don't print the numbers at the bottom
     case 2:
-        second_line_motif[1] = 'a' + HedgehogStack_peek_nth(&cell->stack, 1);
+        second_line_motif[1] = 'a' + (char)HedgehogStack_peek_nth(&cell->stack, 1);
         Canvas_draw_line(canvas, x + 1, y + 2, x + 3, y + 2, second_line_motif);
         break;
     case 3:
-        second_line_motif[0] = 'a' + HedgehogStack_peek_nth(&cell->stack, 1);
-        second_line_motif[2] = 'a' + HedgehogStack_peek_nth(&cell->stack, 2);
+        second_line_motif[0] = 'a' + (char)HedgehogStack_peek_nth(&cell->stack, 1);
+        second_line_motif[2] = 'a' + (char)HedgehogStack_peek_nth(&cell->stack, 2);
         Canvas_draw_line(canvas, x + 1, y + 2, x + 3, y + 2, second_line_motif);
         break;
     default:
-        second_line_motif[0] = 'a' + HedgehogStack_peek_nth(&cell->stack, 1);
-        second_line_motif[1] = 'a' + HedgehogStack_peek_nth(&cell->stack, 2);
-        second_line_motif[2] = 'a' + HedgehogStack_peek_nth(&cell->stack, 3);
+        second_line_motif[0] = 'a' + (char)HedgehogStack_peek_nth(&cell->stack, 1);
+        second_line_motif[1] = 'a' + (char)HedgehogStack_peek_nth(&cell->stack, 2);
+        second_line_motif[2] = 'a' + (char)HedgehogStack_peek_nth(&cell->stack, 3);
         Canvas_draw_line(canvas, x + 1, y + 2, x + 3, y + 2, second_line_motif);
         break;
     }
@@ -99,7 +100,7 @@ static void draw_cells(Board* board, Canvas* canvas) {
     }
 }
 
-static int dice(int k) { return rand() % k; }
+static size_t dice(size_t k) { return rand() % k; }
 
 static void to_lower_str(char* s) {
     for (char* i = s; *i != '\0'; i++) {
@@ -262,7 +263,7 @@ static int get_input(Game* game, Input_state input, char* answers) {
 }
 
 ConsoleApplication ConsoleApplication_init(int player_count, size_t width, size_t height) {
-    srand(time(NULL));
+    srand((unsigned int)time(NULL));
 
     ConsoleApplication app;
     app.game = Game_init(player_count, width, height);
@@ -288,8 +289,8 @@ void ConsoleApplication_run(ConsoleApplication* app) {
     while (running) {
         ConsoleApplication_draw(app);
 
-        int dice_y = dice(app->game.board.height);
-        printf("Player %c, the dice rolled a %d !\n", (char)app->game.current_player + 'A', dice_y + 1);
+        size_t dice_y = dice(app->game.board.height);
+        printf("Player %c, the dice rolled a %zu !\n", (char)app->game.current_player + 'A', dice_y + 1);
         if (Game_can_player_move_vertically(&app->game)) {
             if (get_input(&app->game, VERTICAL_QUESTION, answers)) {
                 get_input(&app->game, VERTICAL_COORDINATES, answers);
@@ -309,7 +310,7 @@ void ConsoleApplication_run(ConsoleApplication* app) {
             if (app->game.finished_hedgehogs_counts[app->game.current_player] == HEDGEHOG_COUNT - 1)
                 finished = true;
         } else {
-            printf("Player %c, there are no movable hedgehogs on line %d, your turn is skipped\n", (char)app->game.current_player + 'A', dice_y + 1);
+            printf("Player %c, there are no movable hedgehogs on line %zu, your turn is skipped\n", (char)app->game.current_player + 'A', dice_y + 1);
         }
         if (app->game.current_player == app->game.player_count && finished) {
             ConsoleApplication_end(app);

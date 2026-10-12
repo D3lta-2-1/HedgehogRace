@@ -1,3 +1,4 @@
+#include "hedgehog_stack.h"
 #include <assert.h>
 #include <game.h>
 #include <stddef.h>
@@ -81,13 +82,13 @@ Game Game_init(int player_count, size_t width, size_t height) {
     return game;
 }
 
-bool Game_can_move(Game* game, int player, size_t x, size_t y) {
+bool Game_can_move(Game* game, Owner player, size_t x, size_t y) {
     if (x == game->board.width - 1)
         return false;
     HedgehogStack* stack = &Board_get(&game->board, x, y)->stack;
     if (HedgehogStack_is_empty(stack))
         return false;
-    int tophog = HedgehogStack_peek(stack);
+    Owner tophog = HedgehogStack_peek(stack);
     bool test_1 = player == tophog;
     if (Board_get(&game->board, x, y)->trapped) {
         for (int i = 0; i < x; i++) {
@@ -100,8 +101,8 @@ bool Game_can_move(Game* game, int player, size_t x, size_t y) {
 }
 
 bool Game_can_player_move_vertically(Game* game) {
-    for (int y = 0; y < game->board.height; y++) {
-        for (int x = 0; x < game->board.width - 1; x++) {
+    for (size_t y = 0; y < game->board.height; y++) {
+        for (size_t x = 0; x < game->board.width - 1; x++) {
             if (Game_can_move(game, game->current_player, x, y))
                 return true;
         }
@@ -125,7 +126,7 @@ void Game_move_hedgehog_vertical(Game* game, size_t x, size_t y, int answer) {
     // TODO: get a switch case here
     // we map down to -1 and up to 1;
     BoardCell* current = Board_get(&game->board, x, y);
-    int tophog = HedgehogStack_pop(&current->stack);
+    Owner tophog = HedgehogStack_pop(&current->stack);
     BoardCell* next = Board_get(&game->board, x, y + answer);
     HedgehogStack_push(&next->stack, tophog);
     return;
@@ -133,7 +134,7 @@ void Game_move_hedgehog_vertical(Game* game, size_t x, size_t y, int answer) {
 
 void Game_move_hedgehog_horizontal(Game* game, size_t x, size_t y) {
     BoardCell* current = Board_get(&game->board, x, y);
-    int tophog = HedgehogStack_pop(&current->stack);
+    Owner tophog = HedgehogStack_pop(&current->stack);
     BoardCell* next = Board_get(&game->board, x + 1, y);
     HedgehogStack_push(&next->stack, tophog);
     return;
@@ -152,7 +153,7 @@ Result Game_check_hedgehog_horizontal(Game* game, size_t x, size_t y) {
     BoardCell* cell = Board_get(&game->board, x, y);
     if (HedgehogStack_is_empty(&cell->stack))
         return ERROR;
-    int tophog = HedgehogStack_peek(&cell->stack);
+    Owner tophog = HedgehogStack_peek(&cell->stack);
     if (Game_can_move(game, tophog, x, y))
         return OPTION_1;
     return ERROR;

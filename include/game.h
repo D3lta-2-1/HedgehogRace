@@ -35,15 +35,11 @@ typedef struct {
     size_t* finished_hedgehogs_counts;
 } Game;
 
-typedef enum {
-    OPTION_1 = 1,
-    OPTION_2 = 0,
-    ERROR = -1
-} Result;
+typedef enum { OPTION_1 = 1, OPTION_2 = 0, ERROR = -1 } Result;
 
 Game Game_init(int player_count, size_t width, size_t height);
 /// returns true if player's hedgehog at line,column can move
-bool Game_can_move(Game* game, int player, size_t x, size_t y);
+bool Game_can_move(Game* game, Owner player, size_t x, size_t y);
 bool Game_can_player_move_vertically(Game* game);
 bool Game_can_player_move_horizontally(Game* game, size_t y);
 void Game_move_hedgehog_vertical(Game* game, size_t x, size_t y, int answer);
