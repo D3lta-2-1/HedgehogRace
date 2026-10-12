@@ -34,7 +34,7 @@ static void draw_decoration(Board* board, Canvas* canvas) {
         Canvas_draw_line(canvas, 0, yorigin + 1, 3, yorigin + 1, "line");
         // writing the value
         assert(y < 1000);
-        char buffer[5] = {' ', ' ', ' ', ' ', '\0'};
+        char buffer[64] = {0};
         size_t n = sprintf(buffer, "%zu", y + 1);
         if (n < 4)
             buffer[n] = ' ';
@@ -305,7 +305,7 @@ void ConsoleApplication_run(ConsoleApplication* app) {
             if (app->game.finished_hedgehogs_counts[app->game.current_player] == HEDGEHOG_COUNT - 1)
                 finished = true;
         } else {
-            printf("Player %c, there are no movable hedgehogs on line %d, your turn is skipped\n", (char)app->game.current_player + 'A', dice_y);
+            printf("Player %c, there are no movable hedgehogs on line %d, your turn is skipped\n", (char)app->game.current_player + 'A', dice_y + 1);
         }
         if (app->game.current_player == app->game.player_count && finished) {
             ConsoleApplication_end(app);
