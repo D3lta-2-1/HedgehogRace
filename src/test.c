@@ -60,7 +60,7 @@ void test_game_rendering(int player_count, size_t width, size_t height) {
 
 void test_end_game(int player_count, size_t width, size_t height) {
     ConsoleApplication app;
-    ConsoleApplication_end()
+    ConsoleApplication_end(&app);
 }
 
 int main(int argc, char** argv) {
