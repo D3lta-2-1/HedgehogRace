@@ -17,9 +17,9 @@
 #define CELL_DISPLAY_WIDTH 5
 #define CELL_DISPLAY_HEIGHT 4
 
-size_t ConsoleApplication_compute_canvas_width(Board* board) { return MARGIN_LEFT + board->width * (CELL_DISPLAY_WIDTH + HORIZONTAL_SPACING) - HORIZONTAL_SPACING; }
+static size_t compute_canvas_width(Board* board) { return MARGIN_LEFT + board->width * (CELL_DISPLAY_WIDTH + HORIZONTAL_SPACING) - HORIZONTAL_SPACING; }
 
-size_t ConsoleApplication_compute_canvas_height(Board* board) { return MARGIN_TOP + board->height * (CELL_DISPLAY_HEIGHT + VERTICAL_SPACING) - VERTICAL_SPACING; }
+static size_t compute_canvas_height(Board* board) { return MARGIN_TOP + board->height * (CELL_DISPLAY_HEIGHT + VERTICAL_SPACING) - VERTICAL_SPACING; }
 
 static void draw_decoration(Board* board, Canvas* canvas) {
     // top decorations
