@@ -19,17 +19,17 @@ Board Board_init(size_t width, size_t height) {
     }
 
     // Trapped cells are fixed up to size 6x8
-    if (width >= 2)
+    if (width > 2)
         Board_get(&board, 2, 0)->trapped = true;
-    if (height >= 1 && width >= 6)
+    if (height > 1 && width > 6)
         Board_get(&board, 6, 1)->trapped = true;
-    if (height >= 2 && width >= 4)
+    if (height > 2 && width > 4)
         Board_get(&board, 4, 2)->trapped = true;
-    if (height >= 3 && width >= 5)
+    if (height > 3 && width > 5)
         Board_get(&board, 5, 3)->trapped = true;
-    if (height >= 4 && width >= 3)
+    if (height > 4 && width > 3)
         Board_get(&board, 3, 4)->trapped = true;
-    if (height >= 5 && width >= 7)
+    if (height > 5 && width > 7)
         Board_get(&board, 7, 5)->trapped = true;
 
     return board;
@@ -123,11 +123,10 @@ bool Game_can_player_move_horizontally(Game* game, size_t y) {
 
 void Game_move_hedgehog_vertical(Game* game, size_t x, size_t y, int answer) {
     // TODO: get a switch case here
-    // we map 0 to -1 and 1 to 1;
-    int up_down = 2 * answer - 1;
+    // we map down to -1 and up to 1;
     BoardCell* current = Board_get(&game->board, x, y);
     int tophog = HedgehogStack_pop(&current->stack);
-    BoardCell* next = Board_get(&game->board, x, y + up_down);
+    BoardCell* next = Board_get(&game->board, x, y + answer);
     HedgehogStack_push(&next->stack, tophog);
     return;
 }
