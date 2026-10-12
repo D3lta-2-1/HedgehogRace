@@ -33,12 +33,16 @@ static void draw_decoration(Board* board, Canvas* canvas) {
         size_t yorigin = MARGIN_TOP + y * (CELL_DISPLAY_HEIGHT + VERTICAL_SPACING);
         Canvas_draw_line(canvas, 0, yorigin + 1, 3, yorigin + 1, "line");
         // writing the value
-        assert(y < 1000);
-        char buffer[64] = {0};
-        size_t n = sprintf(buffer, "%zu", y + 1);
-        if (n < 4)
-            buffer[n] = ' ';
-        Canvas_draw_line(canvas, 0, yorigin + 2, 3, yorigin + 2, buffer);
+        if (y < 1000) {
+            char buffer[5] = "    ";
+            size_t n = sprintf(buffer, "%zu", y + 1);
+            if (n < 4) {
+                buffer[n] = ' ';
+            }
+            Canvas_draw_line(canvas, (4 - n) / 2, yorigin + 2, 3, yorigin + 2, buffer);
+        } else {
+            // unable to display the line count, so ignore
+        }
     }
 }
 
@@ -69,7 +73,7 @@ static void draw_cell_at(BoardCell* cell, Canvas* canvas, size_t x, size_t y) {
         second_line_motif[2] = 'a' + HedgehogStack_peek_nth(&cell->stack, 2);
         Canvas_draw_line(canvas, x + 1, y + 2, x + 3, y + 2, second_line_motif);
         break;
-    case 4:
+    default:
         second_line_motif[0] = 'a' + HedgehogStack_peek_nth(&cell->stack, 1);
         second_line_motif[1] = 'a' + HedgehogStack_peek_nth(&cell->stack, 2);
         second_line_motif[2] = 'a' + HedgehogStack_peek_nth(&cell->stack, 3);
