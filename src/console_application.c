@@ -266,8 +266,8 @@ ConsoleApplication ConsoleApplication_init(int player_count, size_t width, size_
 
     ConsoleApplication app;
     app.game = Game_init(player_count, width, height);
-    size_t canvas_width = ConsoleApplication_compute_canvas_width(&app.game.board);
-    size_t canvas_height = ConsoleApplication_compute_canvas_height(&app.game.board);
+    size_t canvas_width = compute_canvas_width(&app.game.board);
+    size_t canvas_height = compute_canvas_height(&app.game.board);
     app.canvas = Canvas_empty(canvas_width, canvas_height);
     return app;
 }

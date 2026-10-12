@@ -28,7 +28,6 @@ void test_stack() {
 #define WIDTH 101
 #define HEIGHT 31
 void test_canvas() {
-
     Canvas canvas = Canvas_empty(WIDTH, HEIGHT);
     Canvas_draw_line(&canvas, 0, 0, WIDTH - 1, 0, "x-");
     Canvas_draw_line(&canvas, 0, HEIGHT - 1, WIDTH - 1, HEIGHT - 1, "x-");
@@ -54,12 +53,15 @@ ConsoleApplication ConsoleApplication_init_test(int player_count, size_t width, 
     return app;
 }
 
-void test_game_rendering() {
+void test_game_rendering(int player_count, size_t width, size_t height) {
     ConsoleApplication app = ConsoleApplication_init(4, 10, 5);
     ConsoleApplication_draw(&app);
 }
 
-void test_end_game() {}
+void test_end_game(int player_count, size_t width, size_t height) {
+    ConsoleApplication app;
+    ConsoleApplication_end()
+}
 
 int main(int argc, char** argv) {
     ConsoleApplication app = ConsoleApplication_init_test(3, 6, 9);
