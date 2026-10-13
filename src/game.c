@@ -46,6 +46,7 @@ void Board_destroy(Board* board) {
     for (size_t i = 0; i < cell_count; i++) {
         HedgehogStack_destroy(&board->cells[i].stack);
     }
+    free(board->cells);
 }
 
 Game Game_init(int player_count, int hedgehog_count, size_t width, size_t height) {

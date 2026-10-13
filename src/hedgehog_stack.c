@@ -55,6 +55,5 @@ bool HedgehogStack_is_empty(HedgehogStack* stack) { return stack->len == 0; }
 
 void HedgehogStack_destroy(HedgehogStack* stack) {
     if (stack->hedgehogs)
-        return;
-    free(stack->hedgehogs);
+        free(stack->hedgehogs);
 }

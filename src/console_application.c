@@ -4,6 +4,7 @@
 #include <assert.h>
 #include <console_application.h>
 #include <ctype.h>
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -432,18 +433,20 @@ void ConsoleApplication_run(ConsoleApplication* app) {
         if (Game_can_player_move_horizontally(&app->game, dice_y)) {
             player_moved = get_input_horizontal_coordinate(&app->game, answers, dice_y, &x);
             Game_move_hedgehog_horizontal(&app->game, x, dice_y);
-            if (x == app->game.board.width - 1)
+            if (x == app->game.board.width - 2)
                 app->game.finished_hedgehogs_counts[player_moved]++;
             if (app->game.finished_hedgehogs_counts[player_moved] == app->game.hedgehog_count - 1)
                 finished = true;
         } else {
             printf("Player %c, there are no movable hedgehogs on line %zu, your turn is skipped\n", (char)app->game.current_player + 'A', dice_y + 1);
         }
-        if (app->game.current_player == app->game.player_count && finished) {
+        if (app->game.current_player == app->game.player_count - 1 && finished) {
+            running = false;
             ConsoleApplication_end(app);
         } else
             app->game.current_player = (app->game.current_player + 1) % app->game.player_count;
     }
+    return;
 }
 
 static size_t max_under(int* tab, int len, size_t cutoff) {
@@ -458,31 +461,33 @@ static size_t max_under(int* tab, int len, size_t cutoff) {
 }
 
 void ConsoleApplication_end(ConsoleApplication* app) {
+    printf("Game finished! Here are the results :\n");
     size_t max = app->game.hedgehog_count + 1;
     for (int i = 0; i < app->game.player_count; i++) {
         bool virgule = false;
-        printf("- Place #%d : ", i + 1);
+        printf("- Rank #%d : ", i + 1);
         max = max_under(app->game.finished_hedgehogs_counts, app->game.player_count, max);
         for (int j = 0; j < app->game.player_count; j++) {
             if (app->game.finished_hedgehogs_counts[j] == max) {
                 if (!virgule) {
-                    printf("Équipe %c", (char)j + 'A');
+                    printf("Team %c", (char)j + 'A');
                     virgule = true;
                 } else {
-                    printf(", équipe %c", (char)j + 'A');
+                    printf(", team %c", (char)j + 'A');
                     i++;
                 }
             }
         }
         if (max == 1) {
-            printf(" (avec 1 hérisson)\n");
+            printf(" (with 1 hedgehog)\n");
         } else if (max == 0) {
-            printf(" (avec aucun hérisson)\n");
+            printf(" (with no hedgehogs)\n");
         } else {
-            printf(" (avec %zu hérissons)\n", max);
+            printf(" (with %zu hedgehogs)\n", max);
         }
     }
 }
+
 void ConsoleApplication_destroy(ConsoleApplication* app) {
     Game_destroy(&app->game);
     Canvas_destroy(&app->canvas);
