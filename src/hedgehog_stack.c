@@ -54,7 +54,6 @@ Owner HedgehogStack_peek_nth(HedgehogStack* stack, size_t nth) {
 bool HedgehogStack_is_empty(HedgehogStack* stack) { return stack->len == 0; }
 
 void HedgehogStack_destroy(HedgehogStack* stack) {
-    if (!stack->hedgehogs)
-        return;
-    free(stack->hedgehogs);
+    if (stack->hedgehogs)
+        free(stack->hedgehogs);
 }
