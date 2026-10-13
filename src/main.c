@@ -1,7 +1,13 @@
 #include "console_application.h"
+#include <stddef.h>
 #include <stdlib.h>
 
 int main(int argc, char** argv) {
+
+    int player_count = 2;
+    int hedgehog_count = 8;
+    size_t width = 6;
+    size_t height = 8;
 
     /*
     if (argc < 4) return 1;
@@ -10,7 +16,7 @@ int main(int argc, char** argv) {
     char n_columns = *argv[3];
     */
 
-    ConsoleApplication app = ConsoleApplication_init(2, 2, 2);
+    ConsoleApplication app = ConsoleApplication_init(player_count, hedgehog_count, width, height);
     ConsoleApplication_run(&app);
     ConsoleApplication_destroy(&app);
     return EXIT_SUCCESS;

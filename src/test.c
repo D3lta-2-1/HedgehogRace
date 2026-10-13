@@ -36,7 +36,7 @@ void test_canvas() {
 }
 
 ConsoleApplication ConsoleApplication_init_test(int player_count, size_t width, size_t height) {
-    ConsoleApplication app = ConsoleApplication_init(2, 2, 2);
+    ConsoleApplication app = ConsoleApplication_init(2, 8, 2, 2);
 
     // extra hedgehogs for testing
     BoardCell* cell;
@@ -54,7 +54,7 @@ ConsoleApplication ConsoleApplication_init_test(int player_count, size_t width, 
 }
 
 void test_game_rendering(int player_count, size_t width, size_t height) {
-    ConsoleApplication app = ConsoleApplication_init(4, 10, 5);
+    ConsoleApplication app = ConsoleApplication_init(4, 8, 10, 5);
     ConsoleApplication_draw(&app);
 }
 

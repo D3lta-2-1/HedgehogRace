@@ -7,7 +7,6 @@
 #include <stdint.h>
 
 #define MAX_PLAYER_COUNT 26
-#define HEDGEHOG_COUNT 4
 #define START 0
 
 /// Allows quick access to each players hedgehogs and number of hedgehogs that
@@ -32,12 +31,13 @@ typedef struct {
     Board board;
     Owner current_player;
     int player_count;
+    int hedgehog_count;
     size_t* finished_hedgehogs_counts;
 } Game;
 
 typedef enum { OPTION_1 = 1, OPTION_2 = 0, ERROR = -1 } Result;
 
-Game Game_init(int player_count, size_t width, size_t height);
+Game Game_init(int player_count, int hedgehog_count, size_t width, size_t height);
 /// returns true if player's hedgehog at line,column can move
 bool Game_can_move(Game* game, Owner player, size_t x, size_t y);
 bool Game_can_player_move_vertically(Game* game);

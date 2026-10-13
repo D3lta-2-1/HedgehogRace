@@ -11,7 +11,7 @@ typedef struct {
 
 typedef enum { VERTICAL_QUESTION = 0, VERTICAL_COORDINATES = 1, UP_DOWN = 2, HORIZONTAL_COORDINATE = 3 } Input_state;
 
-ConsoleApplication ConsoleApplication_init(int player_count, size_t width, size_t height);
+ConsoleApplication ConsoleApplication_init(int player_count, int hedgehog_count, size_t width, size_t height);
 void ConsoleApplication_draw(ConsoleApplication* app);
 void ConsoleApplication_run(ConsoleApplication* app);
 void ConsoleApplication_end(ConsoleApplication* app);

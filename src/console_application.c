@@ -262,11 +262,11 @@ static int get_input(Game* game, Input_state input, char* answers) {
     }
 }
 
-ConsoleApplication ConsoleApplication_init(int player_count, size_t width, size_t height) {
+ConsoleApplication ConsoleApplication_init(int player_count, int hedgehog_count, size_t width, size_t height) {
     srand((unsigned int)time(NULL));
 
     ConsoleApplication app;
-    app.game = Game_init(player_count, width, height);
+    app.game = Game_init(player_count, hedgehog_count, width, height);
     size_t canvas_width = compute_canvas_width(&app.game.board);
     size_t canvas_height = compute_canvas_height(&app.game.board);
     app.canvas = Canvas_empty(canvas_width, canvas_height);
@@ -307,7 +307,7 @@ void ConsoleApplication_run(ConsoleApplication* app) {
             Game_move_hedgehog_horizontal(&app->game, x, dice_y);
             if (x == app->game.board.width - 1)
                 app->game.finished_hedgehogs_counts[app->game.current_player]++;
-            if (app->game.finished_hedgehogs_counts[app->game.current_player] == HEDGEHOG_COUNT - 1)
+            if (app->game.finished_hedgehogs_counts[app->game.current_player] == app->game.hedgehog_count - 1)
                 finished = true;
         } else {
             printf("Player %c, there are no movable hedgehogs on line %zu, your turn is skipped\n", (char)app->game.current_player + 'A', dice_y + 1);
@@ -331,7 +331,7 @@ static size_t max_under(size_t* tab, int len, size_t cutoff) {
 }
 
 void ConsoleApplication_end(ConsoleApplication* app) {
-    size_t max = HEDGEHOG_COUNT + 1;
+    size_t max = app->game.hedgehog_count + 1;
     for (int i = 0; i < app->game.player_count; i++) {
         bool virgule = false;
         printf("- Place #%d : ", i + 1);

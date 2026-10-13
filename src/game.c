@@ -48,32 +48,38 @@ void Board_destroy(Board* board) {
     }
 }
 
-Game Game_init(int player_count, size_t width, size_t height) {
+Game Game_init(int player_count, int hedgehog_count, size_t width, size_t height) {
     assert(player_count <= MAX_PLAYER_COUNT && "cannot have more than 26 players");
     Game game;
     game.board = Board_init(width, height);
-    game.finished_hedgehogs_counts = malloc(player_count * sizeof(size_t));
-    if (!game.finished_hedgehogs_counts) {
+    game.hedgehog_count = hedgehog_count;
+
+    size_t* placed_hedgehogs = malloc(player_count * sizeof(size_t));
+    if (!placed_hedgehogs) {
         fprintf(stderr, "allocation failed");
         abort();
     }
     for (int i = 0; i < player_count; i++) {
-        game.finished_hedgehogs_counts[i] = 0;
+        placed_hedgehogs[i] = 0;
     }
-    for (int i = 0; i < player_count * HEDGEHOG_COUNT; i++) {
+    for (int i = 0; i < player_count * hedgehog_count; i++) {
         int y = rand() % height;
         bool not_allocated = true;
         Owner player;
         while (not_allocated) {
             player = rand() % player_count;
-            if (game.finished_hedgehogs_counts[player] < HEDGEHOG_COUNT) {
+            if (placed_hedgehogs[player] < hedgehog_count) {
                 BoardCell* cell = Board_get(&game.board, START, y);
                 HedgehogStack_push(&cell->stack, player);
-                game.finished_hedgehogs_counts[player]++;
+                placed_hedgehogs[player]++;
                 not_allocated = false;
             }
         }
     }
+
+    // recycle allocation
+    game.finished_hedgehogs_counts = placed_hedgehogs;
+
     for (int i = 0; i < player_count; i++) {
         game.finished_hedgehogs_counts[i] = 0;
     }
