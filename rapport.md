@@ -35,7 +35,13 @@ xmake run
 
 Il est possible de seulement générer les binaires via la commande `xmake build`, qui apparaîtront dans un sous dossier du dossier build (en fonction de l'architecture et de la plateforme utilisée).
 
-Pour faciliter la construction du projet, des solutions `cmake` et `make` ont été automatiquement généré.
+Pour faciliter la construction du projet, un `makefile` qui construit le jeu et les tests, correspondant au profil de debugage est fourni.
+pour regenerer le makefile avec un autre profil (par exemple en releasedbg)
+
+```shell
+xmake f -m releasedbg
+xmake project -k make
+```
 
 ## Test
 
