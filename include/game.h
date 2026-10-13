@@ -32,7 +32,7 @@ typedef struct {
     Owner current_player;
     int player_count;
     int hedgehog_count;
-    size_t* finished_hedgehogs_counts;
+    int* finished_hedgehogs_counts;
 } Game;
 
 typedef enum { OPTION_1 = 1, OPTION_2 = 0, ERROR = -1 } Result;
@@ -44,8 +44,8 @@ bool Game_can_player_move_vertically(Game* game);
 bool Game_can_player_move_horizontally(Game* game, size_t y);
 void Game_move_hedgehog_vertical(Game* game, size_t x, size_t y, int answer);
 void Game_move_hedgehog_horizontal(Game* game, size_t x, size_t y);
-Result Game_check_hedgehog_vertical(Game* game, size_t x, size_t y);
-Result Game_check_hedgehog_horizontal(Game* game, size_t x, size_t y);
+bool Game_check_hedgehog_vertical(Game* game, size_t x, size_t y);
+int Game_check_hedgehog_horizontal(Game* game, size_t x, size_t y);
 void Game_destroy(Game* game);
 
 #endif

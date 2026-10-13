@@ -5,9 +5,9 @@
 int main(int argc, char** argv) {
 
     int player_count = 2;
-    int hedgehog_count = 8;
-    size_t width = 6;
-    size_t height = 8;
+    int hedgehog_count = 4;
+    size_t width = 9;
+    size_t height = 6;
 
     /*
     if (argc < 4) return 1;

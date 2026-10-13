@@ -59,15 +59,27 @@ void test_game_rendering(int player_count, size_t width, size_t height) {
 }
 
 void test_end_game(int player_count, size_t width, size_t height) {
-    ConsoleApplication app;
+    ConsoleApplication app = ConsoleApplication_init(5, 4, 9, 6);
+    int hedgehog_count = 4;
+
+    app.game.player_count = 5;
+    app.game.finished_hedgehogs_counts = malloc(app.game.player_count * sizeof(int));
+
+    // tests
+    app.game.finished_hedgehogs_counts[0] = hedgehog_count;
+    app.game.finished_hedgehogs_counts[1] = 0;
+    app.game.finished_hedgehogs_counts[2] = hedgehog_count - 3;
+    app.game.finished_hedgehogs_counts[3] = hedgehog_count - 2;
+    app.game.finished_hedgehogs_counts[4] = hedgehog_count;
+
     ConsoleApplication_end(&app);
 }
 
 int main(int argc, char** argv) {
-    ConsoleApplication app = ConsoleApplication_init_test(3, 6, 9);
+    ConsoleApplication app = ConsoleApplication_init(2, 4, 2, 2);
     ConsoleApplication_run(&app);
     ConsoleApplication_destroy(&app);
 
-    printf("all test passed successfully\n");
+    printf("all tests passed successfully\n");
     return EXIT_SUCCESS;
 }
