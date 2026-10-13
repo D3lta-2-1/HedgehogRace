@@ -161,7 +161,9 @@ static int get_input(Game* game, Input_state input, char* answers) {
     int y_3;
     int x_3;
     char* yes = "yes";
+    char* y = "y";
     char* no = "no";
+    char* n = "n";
     char* up = "up";
     char* down = "down";
     Result res = ERROR;
@@ -196,6 +198,8 @@ static int get_input(Game* game, Input_state input, char* answers) {
         switch (input) {
         case VERTICAL_QUESTION:
             res = test_binary_string(answers, yes, no);
+            if (res == ERROR)
+                res = test_binary_string(answers, y, n);
             break;
         case VERTICAL_COORDINATES:
             y_1 = (int)(answers[1] - '1');
