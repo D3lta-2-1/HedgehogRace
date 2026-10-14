@@ -158,7 +158,7 @@ int Game_check_hedgehog_horizontal(Game* game, size_t x, size_t y) {
         return -1;
     Owner tophog = HedgehogStack_peek(&cell->stack);
     if (Game_can_move(game, tophog, x, y))
-        return tophog;
+        return (int)tophog;
     return -1;
 }
 

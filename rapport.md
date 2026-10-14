@@ -63,7 +63,7 @@ L'implémentation du jeu essaye de séparer au maximum la représentation du jeu
 
 - Le jeu est représenté par un tableau a deux dimension de cellules dans lequels sont stockés les hérissons. Chaque cellule contient une pile dans laquelle on identifie chaque hérisson par le joueur auquel il appartient.
 - Le rendu du jeu est réalisé dans un tampon avant d'être envoyé dans la sortie standard, cela permet de simplifier le code du rendu à l'aide de rendu le ligne
-- La plupart des allocations sont dynamiques pour pouvoir configurer le jeu sans le recompiler.
+- La plupart des allocations sont dynamiques pour pouvoir configurer le jeu sans le recompiler. Pour moddifer le nombre de joueurs, de hérissons ou la taille de la grille, il suffit de de passer des arguments supplémentaires. Si ce ci ne sont pas correctement reconnus, le programme affiche un message d'aide. Le programme vérifie que ces entrées sont correctement formées et sont des valeurs valide .
 
 Beaucoup de temps à été passé à unifier deux conventions sur l'accés aux cellules, la première que l'on a gardé voit le plateau comme un plan avec son origine en haut à gauche et la deuxième le voit comme un tableau de lignes et de colonnes
 L'une est plus claire pour le rendu, l'autre plus claire pour le déroulement et la logique du jeu. On a préféré garder la même dans l'intégrité du code final.
